@@ -17,7 +17,7 @@ contract('RozetToken', function(accounts) {
       return rozetToken.showBalance.call();
     }).then(function(balance) {
       assert.equal(balance, initalBalance - amountToBurn,
-        "Failed to burn correct amount of Roz.");
+        "Failed to burn correct amount.");
     });
   });
 
