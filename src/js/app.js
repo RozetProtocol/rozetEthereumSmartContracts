@@ -76,7 +76,7 @@ App = {
     }).then(function(bytesName) {
       var name = web3.toAscii(bytesName);
       document.getElementById("title").innerHTML=name;
-      return rozet.getBadges.call(ownerAddress);
+      return rozet.getBadges.call();
 
     }).then(function(badges) {
       var dataArray = badges[0];

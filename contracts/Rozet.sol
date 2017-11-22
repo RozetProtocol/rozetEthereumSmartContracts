@@ -136,7 +136,7 @@ contract Rozet {
     return (badge.data, badge.maker, badge.owner);
   }
 
-  function getBadges(address _owner) constant public returns
+  function getBadgesFrom(address _owner) constant public returns
   (bytes32[], address[], address[]) {
     BadgeLibrary.Badge[] memory callersProfile = profiles[_owner];
     uint length = callersProfile.length;
