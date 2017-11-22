@@ -49,6 +49,11 @@ contract Rozet {
     return profileNames[msg.sender];
   }
 
+  // Get the name associated with the address.
+  function getNameOf(address _address) constant public returns (bytes32 name) {
+    return profileNames[_address];
+  }
+
   // Get the address associated with the given name.
   function getAddress(bytes32 name) constant public returns (address _address) {
     return profileAddresses[name];
@@ -156,22 +161,24 @@ contract Rozet {
   }
 
   function getBadges() constant public returns
-  (bytes32[], address[], address[]) {
+  (bytes32[], address[], bytes32[], address[]) {
     BadgeLibrary.Badge[] memory callersProfile = profiles[msg.sender];
     uint length = callersProfile.length;
 
     bytes32[] memory dataArray = new bytes32[](length);
-    address[] memory makersArray = new address[](length);
+    address[] memory makersAddressArray = new address[](length);
+    bytes32[] memory makersNameArray = new bytes32[](length);
     address[] memory ownersArray = new address[](length);
 
     for (uint i = 0; i < callersProfile.length; i++) {
       BadgeLibrary.Badge memory badge =  callersProfile[i];
       dataArray[i] = badge.data;
-      makersArray[i] = badge.maker;
+      makersAddressArray[i] = badge.maker;
+      makersNameArray[i] = getNameOf(badge.maker);
       ownersArray[i] = badge.owner;
     }
 
-    return (dataArray, makersArray, ownersArray);
+    return (dataArray, makersAddressArray, makersNameArray, ownersArray);
   }
 
   function getNumberOfBadges(address _owner) constant public returns

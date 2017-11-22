@@ -116,7 +116,7 @@ contract('Rozet', function(accounts) {
   });
 
   it("Get Badges", function() {
-    return rozet.getBadges.call(ownerAddress).then(function(badges) {
+    return rozet.getBadgesFrom.call(ownerAddress).then(function(badges) {
       var dataArray = badges[0];
       var makerArray = badges[1];
       var ownerArray = badges[2];

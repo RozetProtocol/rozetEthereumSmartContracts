@@ -29,9 +29,23 @@
       </div>
 
       <div id="badgeRow" class="row">
+        <h> <b>Your Badges: </b></h>
+        <br>
+        <br>
         <!-- Badge LOAD HERE -->
       </div>
+      <br>
+      <b>Create a new badge:</b>
+      <br>
+      <br>
+      <p>Issue to: </p><input type="text" style="float:left" id="ownerField"  placeholder="">
+      <br><br>
+      <p>Badge Data: </p><input type="text" style="float:left" id="dataField"  placeholder="">
+      <br>
+      <br>
+      <input type="submit" name="submit" value="Send Badge" onClick="App.sendBadge()">
     </div>
+
 
     <div id="badgeTemplate" style="display: none;">
       <div class="col-sm-6 col-md-4 col-lg-3">

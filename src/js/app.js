@@ -1,6 +1,11 @@
+var rozet;
+var accounts;
+
+
 App = {
   web3Provider: null,
   contracts: {},
+
 
   // To make this site appear on the github server
   // change the directories of all .getJSON() calls.
@@ -27,6 +32,7 @@ App = {
 
   rozet.issueBadge("Badge1", ownerAddress, makerAddress, {from: makerAddress});
   rozet.issueBadge("Badge2", ownerAddress, makerAddress, {from: makerAddress});
+  rozet.issueBadge("Badge3", ownerAddress, ownerAddress, {from: ownerAddress});
 
   */
 
@@ -67,27 +73,43 @@ App = {
   },
 
   populateProfile: function() {
-   var rozet;
 
     App.contracts.Rozet.deployed().then(function(instance) {
       rozet = instance;
+
       return rozet.getName.call();
 
     }).then(function(bytesName) {
-      var name = web3.toAscii(bytesName);
+
+      var name = "You are logged in as: " + web3.toAscii(bytesName);
       document.getElementById("title").innerHTML=name;
       return rozet.getBadges.call();
 
     }).then(function(badges) {
       var dataArray = badges[0];
       var makerArray = badges[1];
+      var makerNameArray = badges[2];
 
       // Display the data for each badge in the user's profile.
-      console.log(dataArray);
+      for (i in dataArray) {
+
+        badge = document.createElement("div");
+        badge.innerHTML = "<p>" + web3.toAscii(dataArray[i]) + "<br>" +
+        "Made by: " + web3.toAscii(makerNameArray[i]) + " " + makerArray[i] +"</p>";
+        document.getElementById("badgeRow").appendChild(badge);
+      }
 
     }).catch(function(err) {
       console.log(err.message);
     });
+  },
+
+  sendBadge: function() {
+    var data = document.getElementById("dataField").value;
+    var owner = document.getElementById("ownerField").value;
+
+    rozet.issueBadge(data, owner, 0);
+    console.log("data " + data + "owner " + owner);
   },
 
   markAuthenticated: function() {
@@ -97,7 +119,6 @@ App = {
   handleAuthenticate: function() {
 
   }
-
 };
 
 $(function() {
