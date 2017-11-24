@@ -53,8 +53,9 @@ App = {
   },
 
   initContract: function() {
-
+    console.log("here");
     $.getJSON('../build/contracts/Rozet.json', function(data) {
+      console.log("now here");
       // Get the necessary contract artifact file and instantiate it with truffle-contract.
       var RozetArtifact = data;
       App.contracts.Rozet = TruffleContract(RozetArtifact);
