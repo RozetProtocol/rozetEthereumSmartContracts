@@ -108,8 +108,10 @@ App = {
     var data = document.getElementById("dataField").value;
     var owner = document.getElementById("ownerField").value;
 
-    rozet.issueBadge(data, owner, 0);
-    console.log("data " + data + "owner " + owner);
+    return rozet.issueBadge(data, owner, 0).then(function() {
+      // refresh the webage. 
+      window.location.href = window.location.href.split("#")[0];
+    });
   },
 
   markAuthenticated: function() {
