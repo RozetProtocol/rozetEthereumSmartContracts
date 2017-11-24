@@ -33,7 +33,6 @@ App = {
   rozet.issueBadge("Badge1", ownerAddress, makerAddress, {from: makerAddress});
   rozet.issueBadge("Badge2", ownerAddress, makerAddress, {from: makerAddress});
   rozet.issueBadge("Badge3", ownerAddress, ownerAddress, {from: ownerAddress});
-
   */
 
   init: function() {
@@ -55,7 +54,7 @@ App = {
 
   initContract: function() {
 
-    $.getJSON('Rozet.json', function(data) {
+    $.getJSON('../build/contracts/Rozet.json', function(data) {
       // Get the necessary contract artifact file and instantiate it with truffle-contract.
       var RozetArtifact = data;
       App.contracts.Rozet = TruffleContract(RozetArtifact);
