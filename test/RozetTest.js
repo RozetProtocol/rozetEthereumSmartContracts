@@ -127,27 +127,20 @@ contract('Rozet', function(accounts) {
 
 });
 
+
+
 // TODO make sure that geting badges works in parallel. in otherwords
 // what happens if you auth the lastest badge but then someone assings a new
 // badge during that process?
 
-/* TODO
-in theory:  .call() functions will not change the state of the network even
-if you try.  functions without .call() can not return a value even if you try.
-yet is solidity when i get the return value of transferFrom i do get a bool
-so why is it that i can seem to get a return value from a transaction in solidity
-but i cant in javascript?
- maybe because when i call from solidity its part of the same transaction?
-*/
 
-/*TODO what happens if a badge is authenticated twice? Nothing right? */
+// TODO what happens if a badge is authenticated twice? Nothing right?
 
 // TODO add attempt to authenticate a reputable user without paying.
 
 // TODO add a test to make sure that the only address that can add badges
 // to Rozet is the Rozet contract itself
 
-// TODO replace the DNS with some mechanism so that we can add one later.
 
 // TODO how can we ensure that when ethereum adds the new feature for
 // third party gas payment that our code can update to use it?
