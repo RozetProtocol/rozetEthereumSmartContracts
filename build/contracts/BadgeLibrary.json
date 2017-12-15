@@ -207,5 +207,9 @@
   },
   "networks": {},
   "schemaVersion": "1.0.1",
+<<<<<<< HEAD
   "updatedAt": "2017-12-15T20:15:10.082Z"
+=======
+  "updatedAt": "2017-12-15T19:39:37.260Z"
+>>>>>>> b1b90ace156fdf2dd9195aca68f8039bcfb78b41
 }
