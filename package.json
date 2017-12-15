@@ -16,6 +16,7 @@
     "lite-server": "^2.3.0"
   },
   "dependencies": {
-    "solc": "^0.4.15"
+    "solc": "^0.4.15",
+    "truffle-hdwallet-provider": "0.0.3"
   }
 }

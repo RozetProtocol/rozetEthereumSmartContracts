@@ -55,6 +55,7 @@ App = {
   initContract: function() {
     console.log("here");
     $.getJSON('../build/contracts/Rozet.json', function(data) {
+    //$.getJSON('Rozet.json', function(data) {
       console.log("now here");
       // Get the necessary contract artifact file and instantiate it with truffle-contract.
       var RozetArtifact = data;
@@ -109,8 +110,7 @@ App = {
     var owner = document.getElementById("ownerField").value;
 
     return rozet.issueBadge(data, owner, 0).then(function() {
-      // refresh the webage. 
-      window.location.href = window.location.href.split("#")[0];
+      // TODO refresh the webage.
     });
   },
 
