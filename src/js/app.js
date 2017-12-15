@@ -56,9 +56,9 @@ App = {
   initContract: function() {
     console.log("here");
     // to run on real server:
-    //$.getJSON('../build/contracts/Rozet.json', function(data) {
+    $.getJSON('../build/contracts/Rozet.json', function(data) {
     // to run locally:
-    $.getJSON('Rozet.json', function(data) {
+    //$.getJSON('Rozet.json', function(data) {
       console.log("now here");
       // Get the necessary contract artifact file and instantiate it with truffle-contract.
       var RozetArtifact = data;
