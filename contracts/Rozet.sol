@@ -3,6 +3,9 @@ pragma solidity ^0.4.15;
 import "../contracts/BadgeLibrary.sol";
 import "../contracts/RozetToken.sol";
 
+//import "BadgeLibrary.sol";
+//import "RozetToken.sol";
+
 contract Rozet {
 
   event DebugOutput(string a, address b, address c, uint d);
