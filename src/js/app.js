@@ -38,6 +38,7 @@ App = {
   init: function() {
 
     if (typeof web3 !== 'undefined') {
+      console.log("We have web3");
       App.web3Provider = web3.currentProvider;
       web3 = new Web3(web3.currentProvider);
     } else {
@@ -54,8 +55,10 @@ App = {
 
   initContract: function() {
     console.log("here");
-    $.getJSON('../build/contracts/Rozet.json', function(data) {
-    //$.getJSON('Rozet.json', function(data) {
+    // to run on real server:
+    //$.getJSON('../build/contracts/Rozet.json', function(data) {
+    // to run locally:
+    $.getJSON('Rozet.json', function(data) {
       console.log("now here");
       // Get the necessary contract artifact file and instantiate it with truffle-contract.
       var RozetArtifact = data;
