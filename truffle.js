@@ -8,6 +8,11 @@ const rinkebyProvider = new HDWalletProvider(
   "https://rinkeby.infura.io/8M4M4zT6uiGQe2I0fiB2 "
 );
 
+console.log("Provider: ")
+console.log(rinkebyProvider);
+
+require("babel-register");
+require("babel-polyfill");
 
 module.exports = {
   networks: {
