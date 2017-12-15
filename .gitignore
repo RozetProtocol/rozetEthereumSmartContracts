@@ -1,4 +1,8 @@
 /node_modules
+<<<<<<< HEAD
+=======
+/build
+>>>>>>> b1b90ace156fdf2dd9195aca68f8039bcfb78b41
 coverage.json
 coverage/
 
