@@ -6,14 +6,12 @@ App = {
   web3Provider: null,
   contracts: {},
 
-
   // To make this site appear on the github server
   // change the directories of all .getJSON() calls.
   // For example: to run locally the directory for Rozet would be:
   // .getJSON('Rozet.json')
   // to run on the real server the direcotry would be:
   // .getJSON(../build/contracts/Rozet.json')
-
 
   /*
   This is code to copy and paste into the turffle console that will populate
@@ -54,12 +52,10 @@ App = {
   },
 
   initContract: function() {
-    console.log("here");
     // to run on real server:
-    $.getJSON('../build/contracts/Rozet.json', function(data) {
+    //$.getJSON('../build/contracts/Rozet.json', function(data) {
     // to run locally:
-    //$.getJSON('Rozet.json', function(data) {
-      console.log("now here");
+    $.getJSON('Rozet.json', function(data) {
       // Get the necessary contract artifact file and instantiate it with truffle-contract.
       var RozetArtifact = data;
       App.contracts.Rozet = TruffleContract(RozetArtifact);
@@ -77,9 +73,11 @@ App = {
   },
 
   populateProfile: function() {
+    console.log("here");
 
     App.contracts.Rozet.deployed().then(function(instance) {
       rozet = instance;
+      console.log("here");
 
       return rozet.getName.call();
 

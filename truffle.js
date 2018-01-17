@@ -16,19 +16,20 @@ require("babel-polyfill");
 
 module.exports = {
   networks: {
-    development: {
+   /* development: {
       host: "localhost",
       port: 8545,
       network_id: "*", // Match any network id
       gas: 6712388
     },
+    /*
     rinkeby: {
       network_id: 4,
       provider: rinkebyProvider,
       gasPrice: "20000000000",
       gasLimit: "4704624",
       gas: "4704624"
-    }/*
+    }*//*
     rinkeby: {
   	 host: "localhost", // Connect to geth on the specified
       port: 8545,

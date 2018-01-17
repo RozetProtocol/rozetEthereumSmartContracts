@@ -1,15 +1,15 @@
 {
   "contractName": "BadgeLibrary",
   "abi": [],
-  "bytecode": "0x60606040523415600e57600080fd5b603580601b6000396000f3006060604052600080fd00a165627a7a72305820dd2b67c4bd9ea3e56be37a02dd1a5d2b43ca5622d520a1f0716aa9b5a9a19aca0029",
-  "deployedBytecode": "0x6060604052600080fd00a165627a7a72305820dd2b67c4bd9ea3e56be37a02dd1a5d2b43ca5622d520a1f0716aa9b5a9a19aca0029",
+  "bytecode": "0x60606040523415600e57600080fd5b603580601b6000396000f3006060604052600080fd00a165627a7a72305820bba8aa0cbdf8ec33efc2b0e5b9543c3b8aad235e2fb86b371913a06bd02d16a70029",
+  "deployedBytecode": "0x6060604052600080fd00a165627a7a72305820bba8aa0cbdf8ec33efc2b0e5b9543c3b8aad235e2fb86b371913a06bd02d16a70029",
   "sourceMap": "295:154:0:-;;;;;;;;;;;;;;;;;",
   "deployedSourceMap": "295:154:0:-;;;;;",
   "source": "pragma solidity ^0.4.15;\n\n/* This is a library, which means it has no account and no ether and\n uses no gas and no memory. The \"storage\" keyword indicates that the paramater\nuses the callers storage as memory. See:\nhttps://blog.aragon.one/library-driven-development-in-solidity-2bebcaf88736\n*/\n\nlibrary BadgeLibrary {\n\n  struct Badge {\n    bytes32 data;\n    address maker;\n    address owner;\n    bool isAuthenticated;\n    address addressToPay;\n  }\n}\n",
-  "sourcePath": "/Users/nathanmarrocco/RozetPlatform.github.io/contracts/BadgeLibrary.sol",
+  "sourcePath": "/Users/nathanmarrocco/Documents/RozetPlatform.github.io/contracts/BadgeLibrary.sol",
   "ast": {
     "attributes": {
-      "absolutePath": "/Users/nathanmarrocco/RozetPlatform.github.io/contracts/BadgeLibrary.sol",
+      "absolutePath": "/Users/nathanmarrocco/Documents/RozetPlatform.github.io/contracts/BadgeLibrary.sol",
       "exportedSymbols": {
         "BadgeLibrary": [
           13
@@ -207,5 +207,5 @@
   },
   "networks": {},
   "schemaVersion": "1.0.1",
-  "updatedAt": "2017-12-21T03:35:49.768Z"
+  "updatedAt": "2018-01-17T18:47:54.175Z"
 }

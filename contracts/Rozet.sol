@@ -9,7 +9,9 @@ import "../contracts/RozetToken.sol";
 contract Rozet {
 
   event DebugOutput(string a, address b, address c, uint d);
-  //DebugOutput("Words here.", msg.sender, _owner, 0);
+
+
+//  DebugOutput("Words here.", msg.sender, _owner, 0);
 
   using BadgeLibrary for BadgeLibrary.Badge;
 

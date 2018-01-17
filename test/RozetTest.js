@@ -159,5 +159,5 @@ contract('Rozet', function(accounts) {
 // solidity:
 //var event = rozet.DebugOutput();
 //event.watch(function(error, result) {
-//  console.log(result);
+  //console.log(result);
 //});
