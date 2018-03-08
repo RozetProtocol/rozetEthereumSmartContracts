@@ -6,6 +6,8 @@ import "../contracts/RozetToken.sol";
 //import "BadgeLibrary.sol";
 //import "RozetToken.sol";
 
+// test
+
 contract Rozet {
 
   event DebugOutput(string a, address b, address c, uint d);
