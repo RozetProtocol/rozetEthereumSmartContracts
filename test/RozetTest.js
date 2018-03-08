@@ -24,7 +24,7 @@ contract('Rozet', function(accounts) {
       "Authentication Price can not be free.");
     });
   });
-
+/*
   it("Register Name", function() {
     return rozet.register("Maker", {from: makerAddress}).then(function() {
       return rozet.getName.call({from: makerAddress});
@@ -41,7 +41,7 @@ contract('Rozet', function(accounts) {
       const nameString = web3.toAscii(nameBytes).substring(0, "Owner".length);
       assert.equal("Owner", nameString, "Name was not registered.");
     });
-  });
+  });*/
 
   it("Assign Badge", function() {
     // Maker issues Owner his first badge.

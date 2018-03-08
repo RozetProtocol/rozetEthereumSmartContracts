@@ -1,9 +1,7 @@
 pragma solidity ^0.4.19;
 
-//import "../contracts/BadgeLibrary.sol";
 import "../contracts/RozetToken.sol";
 
-//import "BadgeLibrary.sol";
 //import "RozetToken.sol";
 
 contract Rozet {
@@ -11,9 +9,7 @@ contract Rozet {
   event DebugOutput(string a, address b, address c, uint d);
 
 
-//  DebugOutput("Words here.", msg.sender, _owner, 0);
-
-  //using BadgeLibrary for BadgeLibrary.Badge;
+ //  DebugOutput("Words here.", msg.sender, _owner, 0);
 
   uint256 authenticationPrice = 20;
 
@@ -28,8 +24,8 @@ contract Rozet {
   // A profile is a list of Badge objects. This is a mapping of all profiles.
   mapping (address => Badge[]) public profiles;
   // A DNS to convert profiles address to names and visa versa.
-  mapping (address => bytes32) public profileNames;
-  mapping (bytes32 => address) public profileAddresses;
+  //mapping (address => bytes32) public profileNames;
+  //mapping (bytes32 => address) public profileAddresses;
   // Map from addresses that created authenticated Badges to the addresses
   // that own those badges.
   mapping (address => address) public createdAuthenticatedBadgeFor;
@@ -38,7 +34,7 @@ contract Rozet {
   function getAuthenticationPrice() public constant returns (uint256 price) {
     return authenticationPrice;
   }
-
+/*
   // Register the provided name with the caller's address.
   function register(bytes32 name) public returns (bool sucess) {
     if(profileNames[msg.sender] == 0 && name != "") {
@@ -70,7 +66,7 @@ contract Rozet {
   // Get the address associated with the given name.
   function getAddress(bytes32 name) constant public returns (address _address) {
     return profileAddresses[name];
-  }
+  }*/
 
   // Create a new badge and assign it to owner.
   function issueBadge(bytes32 _data, address _owner,
@@ -172,25 +168,22 @@ contract Rozet {
     return (dataArray, makersArray, ownersArray);
   }
 
-  function getBadges() constant public returns
-  (bytes32[], address[], bytes32[], address[]) {
+  function getBadges() constant public returns (bytes32[], address[], bytes32[], address[]) {
     Badge[] memory callersProfile = profiles[msg.sender];
     uint length = callersProfile.length;
 
     bytes32[] memory dataArray = new bytes32[](length);
     address[] memory makersAddressArray = new address[](length);
-    bytes32[] memory makersNameArray = new bytes32[](length);
     address[] memory ownersArray = new address[](length);
 
     for (uint i = 0; i < callersProfile.length; i++) {
       Badge memory badge =  callersProfile[i];
       dataArray[i] = badge.data;
       makersAddressArray[i] = badge.maker;
-      makersNameArray[i] = getNameOf(badge.maker);
       ownersArray[i] = badge.owner;
     }
 
-    return (dataArray, makersAddressArray, makersNameArray, ownersArray);
+    return (dataArray, makersAddressArray, ownersArray);
   }
 
   function getNumberOfBadges(address _owner) constant public returns
