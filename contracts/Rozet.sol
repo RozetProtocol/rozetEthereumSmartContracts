@@ -1,12 +1,10 @@
-pragma solidity ^0.4.15;
+pragma solidity ^0.4.19;
 
-import "../contracts/BadgeLibrary.sol";
+//import "../contracts/BadgeLibrary.sol";
 import "../contracts/RozetToken.sol";
 
 //import "BadgeLibrary.sol";
 //import "RozetToken.sol";
-
-// test
 
 contract Rozet {
 
@@ -15,12 +13,20 @@ contract Rozet {
 
 //  DebugOutput("Words here.", msg.sender, _owner, 0);
 
-  using BadgeLibrary for BadgeLibrary.Badge;
+  //using BadgeLibrary for BadgeLibrary.Badge;
 
   uint256 authenticationPrice = 20;
 
+  struct Badge {
+    bytes32 data;
+    address maker;
+    address owner;
+    bool isAuthenticated;
+    address addressToPay;
+  }
+
   // A profile is a list of Badge objects. This is a mapping of all profiles.
-  mapping (address => BadgeLibrary.Badge[]) public profiles;
+  mapping (address => Badge[]) public profiles;
   // A DNS to convert profiles address to names and visa versa.
   mapping (address => bytes32) public profileNames;
   mapping (bytes32 => address) public profileAddresses;
@@ -70,7 +76,7 @@ contract Rozet {
   function issueBadge(bytes32 _data, address _owner,
   address _addressToPay) public {
 
-    BadgeLibrary.Badge memory badge;
+    Badge memory badge;
     badge.maker = msg.sender;
     badge.owner = _owner;
     badge.data = _data;
@@ -86,10 +92,9 @@ contract Rozet {
 
     // Ensure that the badge exists and that only its true owner is
     // authenticating it.
-    if (_index >= 0 && _index < profiles[_owner].length &&
-    msg.sender == _owner) {
+    if (_index >= 0 && _index < profiles[_owner].length && msg.sender == _owner) {
 
-      BadgeLibrary.Badge memory badge = profiles[_owner][_index];
+      Badge memory badge = profiles[_owner][_index];
 
       bool doesRequirePayment = hasReputation[_owner];
       bool paymentWasMade = false;
@@ -133,8 +138,8 @@ contract Rozet {
   function getBadge(address _owner, uint _index) constant public returns
   (bytes32 data, address maker, address owner) {
 
-    BadgeLibrary.Badge[] storage callersProfile = profiles[_owner];
-    BadgeLibrary.Badge memory badge;
+    Badge[] storage callersProfile = profiles[_owner];
+    Badge memory badge;
 
     if (_index < 0 || _index >= callersProfile.length) {
       badge.data = "Badge does not exist.";
@@ -150,7 +155,7 @@ contract Rozet {
 
   function getBadgesFrom(address _owner) constant public returns
   (bytes32[], address[], address[]) {
-    BadgeLibrary.Badge[] memory callersProfile = profiles[_owner];
+    Badge[] memory callersProfile = profiles[_owner];
     uint length = callersProfile.length;
 
     bytes32[] memory dataArray = new bytes32[](length);
@@ -158,7 +163,7 @@ contract Rozet {
     address[] memory ownersArray = new address[](length);
 
     for (uint i = 0; i < callersProfile.length; i++) {
-      BadgeLibrary.Badge memory badge =  callersProfile[i];
+      Badge memory badge =  callersProfile[i];
       dataArray[i] = badge.data;
       makersArray[i] = badge.maker;
       ownersArray[i] = badge.owner;
@@ -169,7 +174,7 @@ contract Rozet {
 
   function getBadges() constant public returns
   (bytes32[], address[], bytes32[], address[]) {
-    BadgeLibrary.Badge[] memory callersProfile = profiles[msg.sender];
+    Badge[] memory callersProfile = profiles[msg.sender];
     uint length = callersProfile.length;
 
     bytes32[] memory dataArray = new bytes32[](length);
@@ -178,7 +183,7 @@ contract Rozet {
     address[] memory ownersArray = new address[](length);
 
     for (uint i = 0; i < callersProfile.length; i++) {
-      BadgeLibrary.Badge memory badge =  callersProfile[i];
+      Badge memory badge =  callersProfile[i];
       dataArray[i] = badge.data;
       makersAddressArray[i] = badge.maker;
       makersNameArray[i] = getNameOf(badge.maker);
