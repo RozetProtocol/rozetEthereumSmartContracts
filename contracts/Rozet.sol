@@ -168,7 +168,7 @@ contract Rozet {
     return (dataArray, makersArray, ownersArray);
   }
 
-  function getBadges() constant public returns (bytes32[], address[], bytes32[], address[]) {
+  function getBadges() constant public returns (bytes32[], address[], address[]) {
     Badge[] memory callersProfile = profiles[msg.sender];
     uint length = callersProfile.length;
 
