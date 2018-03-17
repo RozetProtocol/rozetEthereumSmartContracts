@@ -2,92 +2,66 @@ pragma solidity ^0.4.19;
 
 import "../contracts/RozetToken.sol";
 
-//import "RozetToken.sol";
-
 contract Rozet {
 
-  event DebugOutput(string a, address b, address c, uint d);
+  address addressOfRozetToken;
 
-
- //  DebugOutput("Words here.", msg.sender, _owner, 0);
+  event BadgeIssued(address maker, address owner, uint id, bytes32 tag1, bytes32 tag2, bytes32 tag3, bytes32 data);
 
   uint256 authenticationPrice = 20;
 
   struct Badge {
     bytes32 data;
+    bytes32 tag1;
+    bytes32 tag2;
+    bytes32 tag3;
     address maker;
     address owner;
     bool isAuthenticated;
     address addressToPay;
   }
 
+  function Rozet(address _addressOfRozetToken) public {
+    addressOfRozetToken = _addressOfRozetToken;
+  }
+
   // A profile is a list of Badge objects. This is a mapping of all profiles.
   mapping (address => Badge[]) public profiles;
-  // A DNS to convert profiles address to names and visa versa.
-  //mapping (address => bytes32) public profileNames;
-  //mapping (bytes32 => address) public profileAddresses;
-  // Map from addresses that created authenticated Badges to the addresses
-  // that own those badges.
+  
+  Badge[] allBadges;
   mapping (address => address) public createdAuthenticatedBadgeFor;
   mapping (address => bool) public hasReputation;
 
   function getAuthenticationPrice() public constant returns (uint256 price) {
     return authenticationPrice;
   }
-/*
-  // Register the provided name with the caller's address.
-  function register(bytes32 name) public returns (bool sucess) {
-    if(profileNames[msg.sender] == 0 && name != "") {
-        profileNames[msg.sender] = name;
-        profileAddresses[name] = msg.sender;
-        return true;
-    }
-    return false;
-  }
-
-  // Remove the callers name from Rozet.
-  function unregister(bytes32 name) public {
-    if(profileNames[msg.sender] != 0 && name != ""){
-      profileAddresses[name] = 0x0000000000000000000000000000000000000000;
-      profileNames[msg.sender] = "";
-    }
-  }
-
-  // Get the name associated with the caller's address.
-  function getName() constant public returns (bytes32 name) {
-    return profileNames[msg.sender];
-  }
-
-  // Get the name associated with the address.
-  function getNameOf(address _address) constant public returns (bytes32 name) {
-    return profileNames[_address];
-  }
-
-  // Get the address associated with the given name.
-  function getAddress(bytes32 name) constant public returns (address _address) {
-    return profileAddresses[name];
-  }*/
 
   // Create a new badge and assign it to owner.
-  function issueBadge(bytes32 _data, address _owner,
-  address _addressToPay) public {
+  function issueBadge(bytes32 _data, address _owner, bytes32 _tag1, bytes32 _tag2, bytes32 _tag3, address _addressToPay) public returns (uint id) {
 
     Badge memory badge;
+    badge.data = _data;
+    badge.tag1 = _tag1;
+    badge.tag2 = _tag2;
+    badge.tag3 = _tag3;
     badge.maker = msg.sender;
     badge.owner = _owner;
-    badge.data = _data;
     badge.isAuthenticated = false;
     badge.addressToPay = _addressToPay;
 
     profiles[_owner].push(badge);
 
+    id = allBadges.push(badge);
+
+    BadgeIssued(badge.maker, _owner, id, _tag1, _tag2, _tag3, _data);
+
+    return id;
+
   }
 
-  function authenticateBadge(address addressOfRozetToken, address _owner,
-  uint _index) public {
+  function authenticateBadge(address _owner, uint _index) public {
 
-    // Ensure that the badge exists and that only its true owner is
-    // authenticating it.
+    // Ensure that the badge exists and that only its true owner is authenticating it.
     if (_index >= 0 && _index < profiles[_owner].length && msg.sender == _owner) {
 
       Badge memory badge = profiles[_owner][_index];
@@ -125,14 +99,12 @@ contract Rozet {
     }
   }
 
-  function isBadgeAuthenticated(address _owner, uint _index) public constant
-  returns (bool isAuthenticated) {
+  function isBadgeAuthenticated(address _owner, uint _index) public constant returns (bool isAuthenticated) {
       return profiles[_owner][_index].isAuthenticated;
   }
 
   // Get the badge of owner that lives at index.
-  function getBadge(address _owner, uint _index) constant public returns
-  (bytes32 data, address maker, address owner) {
+  function getBadge(address _owner, uint _index) constant public returns (bytes32 data, address maker, address owner) {
 
     Badge[] storage callersProfile = profiles[_owner];
     Badge memory badge;
@@ -149,8 +121,7 @@ contract Rozet {
     return (badge.data, badge.maker, badge.owner);
   }
 
-  function getBadgesFrom(address _owner) constant public returns
-  (bytes32[], address[], address[]) {
+  function getBadgesFrom(address _owner) constant public returns (bytes32[], address[], address[]) {
     Badge[] memory callersProfile = profiles[_owner];
     uint length = callersProfile.length;
 
@@ -186,8 +157,7 @@ contract Rozet {
     return (dataArray, makersAddressArray, ownersArray);
   }
 
-  function getNumberOfBadges(address _owner) constant public returns
-  (uint number) {
+  function getNumberOfBadges(address _owner) constant public returns (uint number) {
     return profiles[_owner].length;
   }
 }

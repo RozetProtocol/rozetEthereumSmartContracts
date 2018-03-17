@@ -1,0 +1,54 @@
+
+const RozetToken = artifacts.require("./RozetToken.sol");
+let rozetToken;
+
+function deployContract() {
+  return RozetToken.new().then(function(_rozetToken) {
+    rozetToken = _rozetToken;
+  });
+}
+
+
+contract('RozetToken', function(accounts) {
+
+  before(deployContract);
+
+  it("Send Rozet Token", function() {
+    let initalBalanceOfReciever = 0;
+    let amountToSend = 5;
+    let senderAddress = accounts[0];
+    let recieverAddress = accounts[1];
+    return rozetToken.balanceOf.call(recieverAddress).then(function(balance) {
+      initalBalanceOfReciever += balance.toNumber();
+      return rozetToken.transfer(recieverAddress, amountToSend, {from: senderAddress});
+    }).then(function() {
+        return rozetToken.balanceOf.call(recieverAddress);
+    }).then(function(newBalance) {
+      let expectedAmount = initalBalanceOfReciever + amountToSend;
+      assert.equal(newBalance.toNumber(), expectedAmount,
+      "Amounts do not match.");
+    });
+  });
+
+  it("Withdraw Rozet Token", function() {
+    let initalBalanceOfReciever = 0;
+    let amountToWithdraw = 5;
+    let senderAddress = accounts[0];
+    let recieverAddress = accounts[1];
+    return rozetToken.balanceOf.call(recieverAddress).then(function(balance) {
+      initalBalanceOfReciever += balance.toNumber();
+      // Allow reciever to take money from senders account whenever they want.
+      return rozetToken.approve(recieverAddress, amountToWithdraw,
+      {from: senderAddress});
+    }).then(function() {
+      return rozetToken.transferFrom(senderAddress, recieverAddress, amountToWithdraw, {from: recieverAddress});
+    }).then(function() {
+        return rozetToken.balanceOf.call(recieverAddress);
+    }).then(function(newBalance) {
+      let expectedAmount = initalBalanceOfReciever + amountToWithdraw;
+      assert.equal(newBalance.toNumber(), expectedAmount,
+      "Amounts do not match.");
+    });
+  });
+
+});

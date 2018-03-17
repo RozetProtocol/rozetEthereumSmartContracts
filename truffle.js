@@ -1,8 +1,23 @@
 /*
+
+rozet rinkeby addredss: 
 have event on sync for: 
 reviews
 replies
 set synced=true in firebase and also double check that the content is the same as on ethereum
+
+figure out limits of string siz ein solidity 
+
+add read reviews and replies function so ppl can see the real words on etherum
+
+replies have infinite depth
+
+possible functions: 
+getAllMyReviews
+getUsersReviews
+getReview
+
+store the permalink (which is a unique id of every object in teh database: review, thing being reviewed, and reply)
 
 distribution: 
 Locked
@@ -33,6 +48,8 @@ git add *
 git commit -m "update message"
 // finally push them to the server
 git push origin master
+
+
 
 */
 

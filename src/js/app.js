@@ -1,8 +1,16 @@
-var rozet;
-var accounts;
 
 
-App = {
+//let RozetABI = require('./RozetABI.json')
+//import RozetABI from "./RozetABI.json";
+//import Web3 from "web3";
+//import Promise from "bluebird";
+
+let rozet;
+let accounts;
+let web3;
+
+
+const App = {
   web3Provider: null,
   contracts: {},
 
@@ -55,6 +63,10 @@ App = {
     // to run on real server:
     //$.getJSON('../build/contracts/Rozet.json', function(data) {
     // to run locally:
+    const Rozet = web3.eth.contract(RozetABI)
+    rozet = Rozet.at("0x37de7ac79bede0e3be031d0b9f3a907b0d177657")
+    Promise.promisifyAll(rozet)
+
     $.getJSON('Rozet.json', function(data) {
       // Get the necessary contract artifact file and instantiate it with truffle-contract.
       var RozetArtifact = data;
@@ -110,7 +122,7 @@ App = {
     var data = document.getElementById("dataField").value;
     var owner = document.getElementById("ownerField").value;
 
-    return rozet.issueBadge(data, owner, 0).then(function() {
+    return rozet.issueBadge(data, owner, "tag1", "tag2", "tag3", 0).then(function() {
       // TODO refresh the webage.
     });
   },
