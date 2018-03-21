@@ -1,357 +1,80 @@
 [
-    {
-      "constant": true,
-      "inputs": [
-        {
-          "name": "",
-          "type": "address"
-        },
-        {
-          "name": "",
-          "type": "uint256"
-        }
-      ],
-      "name": "profiles",
-      "outputs": [
-        {
-          "name": "data",
-          "type": "bytes32"
-        },
-        {
-          "name": "tag1",
-          "type": "bytes32"
-        },
-        {
-          "name": "tag2",
-          "type": "bytes32"
-        },
-        {
-          "name": "tag3",
-          "type": "bytes32"
-        },
-        {
-          "name": "maker",
-          "type": "address"
-        },
-        {
-          "name": "owner",
-          "type": "address"
-        },
-        {
-          "name": "isAuthenticated",
-          "type": "bool"
-        },
-        {
-          "name": "addressToPay",
-          "type": "address"
-        }
-      ],
-      "payable": false,
-      "stateMutability": "view",
-      "type": "function"
-    },
-    {
-      "constant": true,
-      "inputs": [
-        {
-          "name": "",
-          "type": "address"
-        }
-      ],
-      "name": "createdAuthenticatedBadgeFor",
-      "outputs": [
-        {
-          "name": "",
-          "type": "address"
-        }
-      ],
-      "payable": false,
-      "stateMutability": "view",
-      "type": "function"
-    },
-    {
-      "constant": true,
-      "inputs": [
-        {
-          "name": "",
-          "type": "address"
-        }
-      ],
-      "name": "hasReputation",
-      "outputs": [
-        {
-          "name": "",
-          "type": "bool"
-        }
-      ],
-      "payable": false,
-      "stateMutability": "view",
-      "type": "function"
-    },
-    {
-      "anonymous": false,
-      "inputs": [
-        {
-          "indexed": false,
-          "name": "a",
-          "type": "string"
-        },
-        {
-          "indexed": false,
-          "name": "b",
-          "type": "address"
-        },
-        {
-          "indexed": false,
-          "name": "c",
-          "type": "address"
-        },
-        {
-          "indexed": false,
-          "name": "d",
-          "type": "uint256"
-        }
-      ],
-      "name": "DebugOutput",
-      "type": "event"
-    },
-    {
-      "anonymous": false,
-      "inputs": [
-        {
-          "indexed": false,
-          "name": "maker",
-          "type": "address"
-        },
-        {
-          "indexed": false,
-          "name": "owner",
-          "type": "address"
-        },
-        {
-          "indexed": false,
-          "name": "id",
-          "type": "uint256"
-        },
-        {
-          "indexed": false,
-          "name": "tag1",
-          "type": "bytes32"
-        },
-        {
-          "indexed": false,
-          "name": "tag2",
-          "type": "bytes32"
-        },
-        {
-          "indexed": false,
-          "name": "tag3",
-          "type": "bytes32"
-        },
-        {
-          "indexed": false,
-          "name": "data",
-          "type": "bytes32"
-        }
-      ],
-      "name": "BadgeIssued",
-      "type": "event"
-    },
-    {
-      "constant": true,
-      "inputs": [],
-      "name": "getAuthenticationPrice",
-      "outputs": [
-        {
-          "name": "price",
-          "type": "uint256"
-        }
-      ],
-      "payable": false,
-      "stateMutability": "view",
-      "type": "function"
-    },
-    {
-      "constant": false,
-      "inputs": [
-        {
-          "name": "_data",
-          "type": "bytes32"
-        },
-        {
-          "name": "_owner",
-          "type": "address"
-        },
-        {
-          "name": "_tag1",
-          "type": "bytes32"
-        },
-        {
-          "name": "_tag2",
-          "type": "bytes32"
-        },
-        {
-          "name": "_tag3",
-          "type": "bytes32"
-        },
-        {
-          "name": "_addressToPay",
-          "type": "address"
-        }
-      ],
-      "name": "issueBadge",
-      "outputs": [
-        {
-          "name": "id",
-          "type": "uint256"
-        }
-      ],
-      "payable": false,
-      "stateMutability": "nonpayable",
-      "type": "function"
-    },
-    {
-      "constant": false,
-      "inputs": [
-        {
-          "name": "addressOfRozetToken",
-          "type": "address"
-        },
-        {
-          "name": "_owner",
-          "type": "address"
-        },
-        {
-          "name": "_index",
-          "type": "uint256"
-        }
-      ],
-      "name": "authenticateBadge",
-      "outputs": [],
-      "payable": false,
-      "stateMutability": "nonpayable",
-      "type": "function"
-    },
-    {
-      "constant": true,
-      "inputs": [
-        {
-          "name": "_owner",
-          "type": "address"
-        },
-        {
-          "name": "_index",
-          "type": "uint256"
-        }
-      ],
-      "name": "isBadgeAuthenticated",
-      "outputs": [
-        {
-          "name": "isAuthenticated",
-          "type": "bool"
-        }
-      ],
-      "payable": false,
-      "stateMutability": "view",
-      "type": "function"
-    },
-    {
-      "constant": true,
-      "inputs": [
-        {
-          "name": "_owner",
-          "type": "address"
-        },
-        {
-          "name": "_index",
-          "type": "uint256"
-        }
-      ],
-      "name": "getBadge",
-      "outputs": [
-        {
-          "name": "data",
-          "type": "bytes32"
-        },
-        {
-          "name": "maker",
-          "type": "address"
-        },
-        {
-          "name": "owner",
-          "type": "address"
-        }
-      ],
-      "payable": false,
-      "stateMutability": "view",
-      "type": "function"
-    },
-    {
-      "constant": true,
-      "inputs": [
-        {
-          "name": "_owner",
-          "type": "address"
-        }
-      ],
-      "name": "getBadgesFrom",
-      "outputs": [
-        {
-          "name": "",
-          "type": "bytes32[]"
-        },
-        {
-          "name": "",
-          "type": "address[]"
-        },
-        {
-          "name": "",
-          "type": "address[]"
-        }
-      ],
-      "payable": false,
-      "stateMutability": "view",
-      "type": "function"
-    },
-    {
-      "constant": true,
-      "inputs": [],
-      "name": "getBadges",
-      "outputs": [
-        {
-          "name": "",
-          "type": "bytes32[]"
-        },
-        {
-          "name": "",
-          "type": "address[]"
-        },
-        {
-          "name": "",
-          "type": "address[]"
-        }
-      ],
-      "payable": false,
-      "stateMutability": "view",
-      "type": "function"
-    },
-    {
-      "constant": true,
-      "inputs": [
-        {
-          "name": "_owner",
-          "type": "address"
-        }
-      ],
-      "name": "getNumberOfBadges",
-      "outputs": [
-        {
-          "name": "number",
-          "type": "uint256"
-        }
-      ],
-      "payable": false,
-      "stateMutability": "view",
-      "type": "function"
-    }
-  ]
+	{
+		"constant": true,
+		"inputs": [],
+		"name": "totalSupply",
+		"outputs": [
+			{
+				"name": "",
+				"type": "uint256"
+			}
+		],
+		"payable": false,
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"constant": true,
+		"inputs": [
+			{
+				"name": "_owner",
+				"type": "address"
+			}
+		],
+		"name": "balanceOf",
+		"outputs": [
+			{
+				"name": "balance",
+				"type": "uint256"
+			}
+		],
+		"payable": false,
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"constant": false,
+		"inputs": [
+			{
+				"name": "_to",
+				"type": "address"
+			},
+			{
+				"name": "_value",
+				"type": "uint256"
+			}
+		],
+		"name": "transfer",
+		"outputs": [
+			{
+				"name": "",
+				"type": "bool"
+			}
+		],
+		"payable": false,
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"anonymous": false,
+		"inputs": [
+			{
+				"indexed": true,
+				"name": "from",
+				"type": "address"
+			},
+			{
+				"indexed": true,
+				"name": "to",
+				"type": "address"
+			},
+			{
+				"indexed": false,
+				"name": "value",
+				"type": "uint256"
+			}
+		],
+		"name": "Transfer",
+		"type": "event"
+	}
+]

@@ -8,7 +8,6 @@ function deployContract() {
   });
 }
 
-
 contract('RozetToken', function(accounts) {
 
   before(deployContract);

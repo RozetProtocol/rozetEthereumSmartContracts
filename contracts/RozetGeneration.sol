@@ -26,6 +26,7 @@ Rozet token sale contract price tier 5 (10%)
 
 pragma solidity ^0.4.18;
 
+import "./Rozet.sol";
 import "./RozetToken.sol";
 import "./SafeMath.sol";
 import "./TokenTimelock.sol";
@@ -33,8 +34,6 @@ import "./ERC20Basic.sol";
 
 contract RozetGeneration {
   using SafeMath for uint256;
-
-  RozetToken public rozetToken;
 
   address public rozetMemberOne;
   address public rozetMemberTwo;
@@ -52,18 +51,30 @@ contract RozetGeneration {
   uint256 public tierThreeEndDate;
   uint256 public tierFourEndDate;
 
+  TokenTimelock public rozetFoundersTimelock;
+  TokenTimelock public rozetPartnersTimeLock;
+
+  RozetToken public rozetToken;
+  Rozet public rozet;
+
   uint256 public cap;
 
   event TokenPurchase(address indexed purchaser, address indexed beneficiary, uint256 value, uint256 amount);
+  // "0x692a70d2e424a56d2c6c27aa97d1a86395877b3a", "0xFa9B0D8BB3e4cCdF443467C9eAF08f3b95420cB7", "0xFa9B0D8BB3e4cCdF443467C9eAF08f3b95420cB7", "0xFa9B0D8BB3e4cCdF443467C9eAF08f3b95420cB7", "0xFa9B0D8BB3e4cCdF443467C9eAF08f3b95420cB7" 
+  function RozetGeneration(address _rozetMemberOne, address _rozetMemberTwo, address _rozetMemberThree, address _partnerOne) public {
+    
+    // Create the RozetToken contract and automaticly transfer all tokens created to this contract.
+    rozetToken = new RozetToken();
 
-  function RozetGeneration(address _rozetToken, address _rozetMemberOne, address _rozetMemberTwo, address _rozetMemberThree, address _partnerOne) public {
+    // Create the Rozet reputation database and ensure that it can only be used with offical Rozet tokens. 
+    rozet = new Rozet(address(rozetToken));
 
-    // When Rozet Tokens are first minted they will all be sent to this contract for distribution.
+    // Establish the addresses of each Rozet founder and partners.
     rozetMemberOne = _rozetMemberOne;
     rozetMemberTwo = _rozetMemberTwo;
     rozetMemberThree = _rozetMemberThree;
     partnerOne = _partnerOne;
-    rozetToken = RozetToken(_rozetToken);
+
     rates  = [1, 2, 3, 4, 5];
     weiRaised = 0;
 
@@ -77,23 +88,16 @@ contract RozetGeneration {
 
     // Rozet partners get 10% of Rozet Tokens locked for one year. 
     uint256 twentyPercentOfSupply = rozetToken.totalSupply() * 20 / 100;
-    TokenTimelock partnerTimeLock = new TokenTimelock(rozetToken, partnerOne, releaseTime);
-    rozetToken.transfer(partnerTimeLock, twentyPercentOfSupply);
+    rozetPartnersTimeLock = new TokenTimelock(rozetToken, partnerOne, releaseTime);
+    rozetToken.transfer(rozetPartnersTimeLock, twentyPercentOfSupply);
 
-    // Each of the three Rozet founders gets 6% of Rozet Tokens locked for one year.
-    uint256 amountPerMember = rozetToken.totalSupply() * 66 / 1000;
-    TokenTimelock rozetMemberOneTimelock = new TokenTimelock(rozetToken, rozetMemberOne, releaseTime);
-    rozetToken.transfer(rozetMemberOneTimelock, amountPerMember);
+    // Rozet founders lock 10% for 1 year.
+    uint256 tenPercentOfSupply = rozetToken.totalSupply() * 10 / 100;
+    // optinally we may change rozetMemberOne to a multisig parityw allet since we dont have enoug gas to make 3 more locks
+    rozetFoundersTimelock = new TokenTimelock(rozetToken, rozetMemberOne, releaseTime);
+    rozetToken.transfer(rozetFoundersTimelock, tenPercentOfSupply);
 
-    TokenTimelock rozetMemberTwoTimelock = new TokenTimelock(rozetToken, rozetMemberTwo, releaseTime);
-    rozetToken.transfer(rozetMemberTwoTimelock, amountPerMember);
-
-    TokenTimelock rozetMemberThreeTimelock = new TokenTimelock(rozetToken, rozetMemberThree, releaseTime);
-    rozetToken.transfer(rozetMemberThreeTimelock, amountPerMember);
-
-    // Lock 10% of the tokens for 100 years
-    TokenTimelock foreverTokenLock = new TokenTimelock(rozetToken, rozetMemberOne, releaseTime);
-    rozetToken.transfer(foreverTokenLock, now + 100 years);
+    // Notice that the remaining 10% of tokens locked in this contract forever since they have not been distributed.
 
   }
 
@@ -128,10 +132,6 @@ contract RozetGeneration {
   function _getTokenAmount(uint256 _weiAmount) internal view returns (uint256) {
     uint256 rate = getRate();
     return _weiAmount.mul(rate);
-  }
-
-  function getTestRate() public view returns (uint256) {
-    return 1;
   }
 
   function getRate() public view returns (uint256) {

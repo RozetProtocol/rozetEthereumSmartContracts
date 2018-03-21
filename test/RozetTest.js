@@ -30,7 +30,7 @@ contract('Rozet', function(accounts) {
       return rozet.issueBadge("First Badge.", ownerAddress, "tag1", "tag2", "tag3", 0, {from: makerAddress}).then(function() {
         return rozet.getBadge.call(ownerAddress, 0);
       }).then(function([data, creator, owner]) {
-        var data = web3.toAscii(data).substring(0, "First Badge.".length);
+        var data = data.substring(0, "First Badge.".length);
         assert.equal("First Badge.", data, "Badge data does not match.");
       });
     });
@@ -70,8 +70,7 @@ contract('Rozet', function(accounts) {
       }).then(function(numberOfOwnersBadges) {
         console.log("Number of Owner's Badges: " + numberOfOwnersBadges);
         indexOfOwnersLatestBadge = numberOfOwnersBadges.toNumber() - 1;
-        // Consumer approves Rozet to take roz from their account
-        // if owner is able to authenticate the second badge.
+        // Consumer approves Rozet to take roz from their account if owner is able to authenticate the second badge.
         return rozetToken.balanceOf(consumerAddress);
 
       }).then(function(balance) {
@@ -107,11 +106,20 @@ contract('Rozet', function(accounts) {
 
     it("Get Badges", function() {
       return rozet.getBadgesFrom.call(ownerAddress).then(function(badges) {
-        var dataArray = badges[0];
+        var idArray = badges[0];
         var makerArray = badges[1];
         var ownerArray = badges[2];
-        console.log(dataArray);
-        assert.equal(dataArray.length, 2, "Owner should have two badges.");
+        console.log(idArray);
+        assert.equal(idArray.length, 2, "Owner should have two badges.");
+      });
+    });
+
+    it("Get Badge by ID", function() {
+      return rozet.getBadgeByID.call(0).then(function(badgeData) {
+        var data = badgeData[0];
+        var maker = badgeData[1];
+        var owner = badgeData[2];
+        assert.equal(data, "First Badge.");
       });
     });
 
@@ -119,10 +127,6 @@ contract('Rozet', function(accounts) {
 });
 
 
-
-// TODO make sure that geting badges works in parallel. in otherwords
-// what happens if you auth the lastest badge but then someone assings a new
-// badge during that process?
 
 
 // TODO what happens if a badge is authenticated twice? Nothing right?
@@ -132,11 +136,6 @@ contract('Rozet', function(accounts) {
 // TODO add a test to make sure that the only address that can add badges
 // to Rozet is the Rozet contract itself
 
-
-// TODO how can we ensure that when ethereum adds the new feature for
-// third party gas payment that our code can update to use it?
-// would we hard fork? or can i encapsulate the function on an address
-// and then swap out the code at that address?
 
 // TODO create a special issueBadge function that calculates the cost of
 // authentication and pays that cost to the badge owner so they can authenticate

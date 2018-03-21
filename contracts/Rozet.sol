@@ -1,17 +1,17 @@
 pragma solidity ^0.4.19;
 
-import "../contracts/RozetToken.sol";
+import "./RozetToken.sol";
 
 contract Rozet {
 
   address addressOfRozetToken;
 
-  event BadgeIssued(address maker, address owner, uint id, bytes32 tag1, bytes32 tag2, bytes32 tag3, bytes32 data);
+  event BadgeIssued(address maker, address owner, uint id, bytes32 tag1, bytes32 tag2, bytes32 tag3, string data);
 
   uint256 authenticationPrice = 20;
 
   struct Badge {
-    bytes32 data;
+    string data;
     bytes32 tag1;
     bytes32 tag2;
     bytes32 tag3;
@@ -19,6 +19,7 @@ contract Rozet {
     address owner;
     bool isAuthenticated;
     address addressToPay;
+    uint id;
   }
 
   function Rozet(address _addressOfRozetToken) public {
@@ -36,8 +37,9 @@ contract Rozet {
     return authenticationPrice;
   }
 
+  // "data", "0x353240323c1845c9475e37394d3704ea1b805f05", "tag1", "tag2", "tag3", "0x353240323c1845c9475e37394d3704ea1b805f05"
   // Create a new badge and assign it to owner.
-  function issueBadge(bytes32 _data, address _owner, bytes32 _tag1, bytes32 _tag2, bytes32 _tag3, address _addressToPay) public returns (uint id) {
+  function issueBadge(string _data, address _owner, bytes32 _tag1, bytes32 _tag2, bytes32 _tag3, address _addressToPay) public returns (uint id) {
 
     Badge memory badge;
     badge.data = _data;
@@ -52,6 +54,7 @@ contract Rozet {
     profiles[_owner].push(badge);
 
     id = allBadges.push(badge);
+    badge.id = id;
 
     BadgeIssued(badge.maker, _owner, id, _tag1, _tag2, _tag3, _data);
 
@@ -77,15 +80,13 @@ contract Rozet {
           RozetToken rozetToken = RozetToken(addressOfRozetToken);
 
           // If transfer was sucessfull.
-          if (rozetToken.transferFrom(badge.maker, badge.addressToPay,
-          authenticationPrice) ) {
+          if (rozetToken.transferFrom(badge.maker, badge.addressToPay, authenticationPrice) ) {
             paymentWasMade = true;
           }
         }
       }
 
-      if((doesRequirePayment && paymentWasMade) ||
-      doesRequirePayment == false) {
+      if((doesRequirePayment && paymentWasMade) || doesRequirePayment == false) {
         badge.isAuthenticated = true;
         profiles[_owner][_index] = badge;
         hasReputation[_owner] = true;
@@ -103,8 +104,12 @@ contract Rozet {
       return profiles[_owner][_index].isAuthenticated;
   }
 
+  function getBadgeByID(uint id) constant public returns (string, address, address) {
+    return (allBadges[id].data, allBadges[id].maker, allBadges[id].owner);
+  }
+
   // Get the badge of owner that lives at index.
-  function getBadge(address _owner, uint _index) constant public returns (bytes32 data, address maker, address owner) {
+  function getBadge(address _owner, uint _index) constant public returns (string data, address maker, address owner) {
 
     Badge[] storage callersProfile = profiles[_owner];
     Badge memory badge;
@@ -121,40 +126,40 @@ contract Rozet {
     return (badge.data, badge.maker, badge.owner);
   }
 
-  function getBadgesFrom(address _owner) constant public returns (bytes32[], address[], address[]) {
+  function getBadgesFrom(address _owner) constant public returns (uint[], address[], address[]) {
     Badge[] memory callersProfile = profiles[_owner];
     uint length = callersProfile.length;
 
-    bytes32[] memory dataArray = new bytes32[](length);
+    uint[] memory idArray = new uint[](length);
     address[] memory makersArray = new address[](length);
     address[] memory ownersArray = new address[](length);
 
     for (uint i = 0; i < callersProfile.length; i++) {
       Badge memory badge =  callersProfile[i];
-      dataArray[i] = badge.data;
+      idArray[i] = badge.id;
       makersArray[i] = badge.maker;
       ownersArray[i] = badge.owner;
     }
 
-    return (dataArray, makersArray, ownersArray);
+    return (idArray, makersArray, ownersArray);
   }
 
-  function getBadges() constant public returns (bytes32[], address[], address[]) {
+  function getBadges() constant public returns (uint[], address[], address[]) {
     Badge[] memory callersProfile = profiles[msg.sender];
     uint length = callersProfile.length;
 
-    bytes32[] memory dataArray = new bytes32[](length);
+    uint[] memory idArray = new uint[](length);
     address[] memory makersAddressArray = new address[](length);
     address[] memory ownersArray = new address[](length);
 
     for (uint i = 0; i < callersProfile.length; i++) {
       Badge memory badge =  callersProfile[i];
-      dataArray[i] = badge.data;
+      idArray[i] = badge.id;
       makersAddressArray[i] = badge.maker;
       ownersArray[i] = badge.owner;
     }
 
-    return (dataArray, makersAddressArray, ownersArray);
+    return (idArray, makersAddressArray, ownersArray);
   }
 
   function getNumberOfBadges(address _owner) constant public returns (uint number) {

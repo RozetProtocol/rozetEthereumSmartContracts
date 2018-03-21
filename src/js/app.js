@@ -1,16 +1,67 @@
+/*
+{
+  content: null,
+  image: null,
+  banner: null,
+  permalink: null,
+  rating: null,
+  recipient: null,
+  recipientsEthAddress: null,
+  sender: null,
+  sendersEthAddress: null,
+  timestamp: null,
+  title: null,
+  video null,
+  type: 'reply/review'
+}
+wrie this as a .json string in data 
+*/
+
+//let RozetABI = require('./RozetABI.json');
+import RozetABI from "./RozetABI.json";
+import Web3 from "web3";
+//let Web3 = require('web3');
 
 
-//let RozetABI = require('./RozetABI.json')
-//import RozetABI from "./RozetABI.json";
-//import Web3 from "web3";
 //import Promise from "bluebird";
 
 let rozet;
 let accounts;
 let web3;
 
+const getWeb3 = new Promise(function(resolve, reject) {
+	
+	// Wait for loading completion to avoid race conditions with web3 injection timing.
+	window.addEventListener('load', function() {
+		var web3 = window.web3
+
+		// Checking if Web3 has been injected by the browser (Mist/MetaMask)
+		if (typeof web3 !== 'undefined') {
+			// Use Mist/MetaMask's provider.
+			web3 = new Web3(web3.currentProvider)
+
+			console.log('Injected web3 detected.');
+
+			resolve({
+				web3: web3,
+				hasAccount: true
+			})
+
+		} else {			
+			// Fallback to infura
+			web3 = new Web3( new Web3.providers.HttpProvider('https://rinkeby.infura.io/uaNKEkpjsyvArG0sHifx'));
+
+			resolve({
+				web3: web3,
+				hasAccount: false
+			})
+			
+		}
+	})
+})
 
 const App = {
+
   web3Provider: null,
   contracts: {},
 
@@ -41,20 +92,15 @@ const App = {
   rozet.issueBadge("Badge3", ownerAddress, ownerAddress, {from: ownerAddress});
   */
 
-  init: function() {
+  init: async function() {
 
-    if (typeof web3 !== 'undefined') {
-      console.log("We have web3");
-      App.web3Provider = web3.currentProvider;
-      web3 = new Web3(web3.currentProvider);
-    } else {
-      // For production if we end up here we need to tell the user
-      // that they need to install metamask if they are using chrome
-      // or switch to mist or something like that.
-      console.log("Could not find injected web3.");
-      // If no injected web3 instance is detected, fallback to the TestRPC
-      App.web3Provider = new Web3.providers.HttpProvider('http://localhost:8545');
-    }
+    var tupple = await getWeb3
+	  web3 = tupple.web3
+    doesHaveAccount = tupple.hasAccount
+    
+    App.web3Provider = web3.currentProvider;
+    web3 = new Web3(web3.currentProvider);
+  
 
     return App.initContract();
   },
@@ -64,7 +110,7 @@ const App = {
     //$.getJSON('../build/contracts/Rozet.json', function(data) {
     // to run locally:
     const Rozet = web3.eth.contract(RozetABI)
-    rozet = Rozet.at("0x37de7ac79bede0e3be031d0b9f3a907b0d177657")
+    rozet = Rozet.at("0x921285014b566db57d2acc3839ead5ed6d316c38")
     Promise.promisifyAll(rozet)
 
     $.getJSON('Rozet.json', function(data) {

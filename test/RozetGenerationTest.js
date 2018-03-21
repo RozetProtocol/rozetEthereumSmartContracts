@@ -1,5 +1,4 @@
 
-const Promise = require('bluebird')
 
 function ether (n) {
   return new web3.BigNumber(web3.toWei(n, 'ether'));
@@ -27,6 +26,26 @@ async function advanceToBlock (number) {
     await advanceBlock();
   }
 }
+
+// Works for testrpc v4.1.3
+const mineOneBlock = async () => {
+  await web3.currentProvider.send({
+    jsonrpc: "2.0",
+    method: "evm_mine",
+    params: [],
+    id: 0
+  });
+};
+
+const forwardEVMTime = async seconds => {
+  await web3.currentProvider.send({
+    jsonrpc: "2.0",
+    method: "evm_increaseTime",
+    params: [seconds],
+    id: 0
+  });
+  await mineOneBlock();
+};
 
 // Increases testrpc time by the passed duration in seconds
 function increaseTime (duration) {
@@ -88,6 +107,7 @@ require('chai')
 
 const RozetToken = artifacts.require("RozetToken.sol");
 const RozetGeneration = artifacts.require("RozetGeneration.sol");
+const TokenTimelock = artifacts.require("TokenTimelock.sol");
 
 let accounts = web3.eth.accounts;
 let rozetMemberOne = accounts[0];
@@ -101,19 +121,12 @@ let rozetToken;
 let rozetGeneration;
 
 function deployContract() {
-  
-  return RozetToken.new().then(function(_rozetToken) {
-    rozetToken = _rozetToken;
-    return RozetGeneration.new(rozetToken.address, rozetMemberOne, rozetMemberTwo, rozetMemberThree, partnerOne, {from: rozetMemberOne});
-  }).then(function(_rozetGeneration) {
+
+  return RozetGeneration.new(rozetMemberOne, rozetMemberTwo, rozetMemberThree, partnerOne, {from: rozetMemberOne}).then(function(_rozetGeneration) {
     rozetGeneration = _rozetGeneration;
-    return rozetToken.totalSupply();
-  }).then(function(supply) {
-    return rozetToken.transfer(rozetGeneration.address, supply);
-  }).then(function(tx) {
-    Promise.promisifyAll(web3.eth)
-    Promise.promisifyAll(rozetGeneration)
-    Promise.promisifyAll(rozetToken)
+    return rozetGeneration.rozetToken();
+  }).then(function(rozetTokenAddress) {
+    rozetToken = RozetToken.at(rozetTokenAddress);
   });
 }
 
@@ -121,13 +134,28 @@ contract('CappedCrowdsale', function ([_, wallet]) {
   let rate = new BigNumber(1);
   let cap = ether(10);
   let lessThanCap = ether(2);
-  let tokenSupply = new BigNumber('1e22');
+  let tokenSupply = new BigNumber('7e21');
   const value = ether(3);
   const expectedTokenAmount = rate.mul(value);
   const expectedMemberShare = value.div(3);
+  const tenPercentOfTotalSupply = new BigNumber('1e+21'); // 10% of total supply 
 
   beforeEach(deployContract); 
 
+  describe('creation' , function () {
+    it('should be funded with roz', async function () {
+      let balance = await rozetToken.balanceOf(rozetGeneration.address);
+      balance.should.be.bignumber.equal(tokenSupply);
+    });
+
+    it('timelock should be funded', async function () {
+      let tokenTimelockAddress = await rozetGeneration.rozetFoundersTimelock();
+      let balance = await rozetToken.balanceOf(tokenTimelockAddress);
+      console.log("b " + balance);
+      balance.should.be.bignumber.equal(tenPercentOfTotalSupply);
+    });
+  });
+/*
   describe('accepting payments', function () {
 
     it('should accept payments within cap', async function () {
@@ -242,6 +270,66 @@ contract('CappedCrowdsale', function ([_, wallet]) {
       const post = web3.eth.getBalance(rozetMemberThree);
       post.minus(pre).should.be.bignumber.equal(expectedMemberShare);
     });
-  });
+  });*/
+
+/*
+  describe("token time lock", function () {
+    const amount = new BigNumber(100);
+    let tokenTimelock;
+
+    before(async function() {
+      let tokenTimelockAddress = await rozetGeneration.rozetFoundersTimelock();
+      tokenTimelock = TokenTimelock.at(tokenTimelockAddress);
+      this.releaseTime = latestTime() + duration.years(1);
+    });
+
+
+    it('cannot be released before time limit', async function () {
+      await tokenTimelock.release().should.be.rejected;
+    });
+  
+    it('cannot be released just before time limit', async function () {
+      await increaseTimeTo(this.releaseTime - duration.seconds(3));
+      await tokenTimelock.release().should.be.rejected;
+    });
+  
+    it('can be released just after limit', async function () {
+      await increaseTimeTo(this.releaseTime + duration.seconds(1));
+      await tokenTimelock.release().should.be.fulfilled;
+      let beneficiary = await tokenTimelock.beneficiary();
+      console.log(beneficiary + " " + rozetMemberOne);
+      const balance = await rozetToken.balanceOf(rozetMemberOne);
+      balance.should.be.bignumber.equal(amount);
+    });
+  
+    
+    it('can be released after time limit', async function () {
+      console.log("HERE")
+     
+      let timelockAddress = (await rozetGeneration.rozetFoundersTimelock).address;
+      let balance = await rozetToken.balanceOf(timelockAddress);
+      console.log("BL " + balance);
+
+      //await increaseTimeTo(this.releaseTime + duration.years(2));
+      console.log(this.releaseTime + duration.years(2))
+      await forwardEVMTime(this.releaseTime + duration.years(2));
+      // does this revert?? 
+      let tx = await tokenTimelock.release().should.be.fulfilled;
+      console.log(tx)
+      balance = await rozetToken.balanceOf(rozetMemberOne);
+      balanceOfTimelock = await rozetToken.balanceOf(tokenTimelock.address);
+     // console.log("TL bal after " + balanceOfTimelock.toNumber());
+      console.log(balance);
+      balance.should.be.bignumber.equal(amount);
+    });
+  
+    it('cannot be released twice', async function () {
+      await increaseTimeTo(this.releaseTime + duration.years(1));
+      await tokenTimelock.release().should.be.fulfilled;
+      await tokenTimelock.release().should.be.rejected;
+      const balance = await rozetToken.balanceOf(rozetMemberOne);
+      balance.should.be.bignumber.equal(amount);
+    });
+  });*/
 
 });
