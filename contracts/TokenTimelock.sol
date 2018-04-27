@@ -1,7 +1,6 @@
 pragma solidity ^0.4.18;
 
-import "./SafeERC20.sol";
-
+import "./RozetToken.sol";
 
 /**
  * @title TokenTimelock
@@ -9,10 +8,8 @@ import "./SafeERC20.sol";
  * beneficiary to extract the tokens after a given release time
  */
 contract TokenTimelock {
-  using SafeERC20 for ERC20Basic;
 
-  // ERC20 basic token contract being held
-  ERC20Basic public token;
+  RozetToken public token;
 
   // beneficiary of tokens after they are released
   address public beneficiary;
@@ -20,7 +17,7 @@ contract TokenTimelock {
   // timestamp when token release is enabled
   uint256 public releaseTime;
 
-  function TokenTimelock(ERC20Basic _token, address _beneficiary, uint256 _releaseTime) public {
+  function TokenTimelock(RozetToken _token, address _beneficiary, uint256 _releaseTime) public {
     require(_releaseTime > now);
     token = _token;
     beneficiary = _beneficiary;
@@ -36,6 +33,6 @@ contract TokenTimelock {
     uint256 amount = token.balanceOf(this);
     require(amount > 0);
 
-    token.safeTransfer(beneficiary, amount);
+    token.transfer(beneficiary, amount);
   }
 }

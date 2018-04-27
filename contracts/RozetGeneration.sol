@@ -1,6 +1,6 @@
 
-/**
- distribution: 
+/*
+distribution: 
 Locked
 Reserve 10% (locked forever)
 
@@ -10,10 +10,6 @@ Rozet partners 20% (mix of locked / unlocked)
 
 Rozet airdrop 10% (unlocked)
 
-airDrop code will need to be automated so that each time someone uses the website we can automate sending them stuff
-but we can do that w javascript, and if we need to we can create a seperate airdrop contrac that can batch send
-
-Auto set
 price tier increases if date is met or if 10% of tokens are sold. 
 
 Rozet token sale contract price tier 1 (10% of all tokens)
@@ -22,7 +18,7 @@ Rozet token sale contract price tier 3 (10%)
 Rozet token sale contract price tier 4 (10%)
 Rozet token sale contract price tier 5 (10%)
 
- */
+*/
 
 pragma solidity ^0.4.18;
 
@@ -30,9 +26,9 @@ import "./Rozet.sol";
 import "./RozetToken.sol";
 import "./SafeMath.sol";
 import "./TokenTimelock.sol";
-import "./ERC20Basic.sol";
 
 contract RozetGeneration {
+
   using SafeMath for uint256;
 
   address public rozetMemberOne;
@@ -85,21 +81,22 @@ contract RozetGeneration {
     // cap of crowsale is 90% of all tokens
     cap = 10 ether;
     uint256 releaseTime = now + 1 years;
-
+/*
     // Rozet partners get 10% of Rozet Tokens locked for one year. 
     uint256 twentyPercentOfSupply = rozetToken.totalSupply() * 20 / 100;
     rozetPartnersTimeLock = new TokenTimelock(rozetToken, partnerOne, releaseTime);
     rozetToken.transfer(rozetPartnersTimeLock, twentyPercentOfSupply);
 
+    // runs out of gas im gonna need to deploy the locks seperatly then use their addresses here instead of deploying them here
     // Rozet founders lock 10% for 1 year.
     uint256 tenPercentOfSupply = rozetToken.totalSupply() * 10 / 100;
     // optinally we may change rozetMemberOne to a multisig parityw allet since we dont have enoug gas to make 3 more locks
     rozetFoundersTimelock = new TokenTimelock(rozetToken, rozetMemberOne, releaseTime);
-    rozetToken.transfer(rozetFoundersTimelock, tenPercentOfSupply);
-
+    //rozetToken.transfer(rozetFoundersTimelock, tenPercentOfSupply);
+*/
     // Notice that the remaining 10% of tokens locked in this contract forever since they have not been distributed.
 
-  }
+  }//89011201002311660488    89011201002311660470
 
   function () external payable {
     buyTokens(msg.sender);

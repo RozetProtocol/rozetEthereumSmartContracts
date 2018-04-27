@@ -57,7 +57,7 @@ contract('Rozet', function(accounts) {
       let authenticationPrice;
       return rozetToken.balanceOf(makerAddress).then(function(balance) {
         makerBalance = balance.toNumber();
-        console.log("Maker's balance before authentication: " + makerBalance);
+        //console.log("Maker's balance before authentication: " + makerBalance);
         // Consumer issues the second badge to owner. Consumer sets the
         // addressToPay to makerAddress because Maker is the one that
         // established Consumer's reputation by issuing the first badge.
@@ -68,22 +68,21 @@ contract('Rozet', function(accounts) {
         return rozet.getNumberOfBadges.call(ownerAddress);
 
       }).then(function(numberOfOwnersBadges) {
-        console.log("Number of Owner's Badges: " + numberOfOwnersBadges);
+        //console.log("Number of Owner's Badges: " + numberOfOwnersBadges);
         indexOfOwnersLatestBadge = numberOfOwnersBadges.toNumber() - 1;
         // Consumer approves Rozet to take roz from their account if owner is able to authenticate the second badge.
         return rozetToken.balanceOf(consumerAddress);
 
       }).then(function(balance) {
-        console.log("Balance of consumer: " + balance);
+       // console.log("Balance of consumer: " + balance);
 
-        return rozet.getAuthenticationPrice();
+        return rozetToken.badgePrice();
 
-      }).then(function(_authenticationPrice) {
-        authenticationPrice = _authenticationPrice;
+      }).then(function(_badgePrice) {
+        authenticationPrice = _badgePrice;
         return rozetToken.approve(rozet.address, authenticationPrice, {from: consumerAddress});
 
       }).then(function() {
-        console.log("test1")
         // Owner then authenticates Consumer's badge and in the process Maker
         // recieves payment from Consumer.
         return rozet.authenticateBadge(ownerAddress, indexOfOwnersLatestBadge, {from: ownerAddress});
@@ -128,7 +127,7 @@ contract('Rozet', function(accounts) {
 
 
 
-
+// TODO remove voting code duplicataion from transfer and transferFrom
 // TODO what happens if a badge is authenticated twice? Nothing right?
 
 // TODO add attempt to authenticate a reputable user without paying.

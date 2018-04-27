@@ -1,14 +1,12 @@
-pragma solidity ^0.4.19;
+pragma solidity ^ 0.4.19;
 
 import "./RozetToken.sol";
 
 contract Rozet {
 
-  address addressOfRozetToken;
+  address public addressOfRozetToken;
 
   event BadgeIssued(address maker, address owner, uint id, bytes32 tag1, bytes32 tag2, bytes32 tag3, string data);
-
-  uint256 authenticationPrice = 20;
 
   struct Badge {
     string data;
@@ -22,24 +20,21 @@ contract Rozet {
     uint id;
   }
 
+  // A profile is a list of Badge objects. This is a mapping of all profiles.
+  mapping(address => Badge[]) public profiles;
+
+  Badge[] allBadges;
+  mapping(address => address) public createdAuthenticatedBadgeFor;
+  mapping(address => bool) public hasReputation;
+
   function Rozet(address _addressOfRozetToken) public {
     addressOfRozetToken = _addressOfRozetToken;
-  }
-
-  // A profile is a list of Badge objects. This is a mapping of all profiles.
-  mapping (address => Badge[]) public profiles;
-  
-  Badge[] allBadges;
-  mapping (address => address) public createdAuthenticatedBadgeFor;
-  mapping (address => bool) public hasReputation;
-
-  function getAuthenticationPrice() public constant returns (uint256 price) {
-    return authenticationPrice;
+    // dateBadgePriceCanBeUpdated = now;
   }
 
   // "data", "0x353240323c1845c9475e37394d3704ea1b805f05", "tag1", "tag2", "tag3", "0x353240323c1845c9475e37394d3704ea1b805f05"
   // Create a new badge and assign it to owner.
-  function issueBadge(string _data, address _owner, bytes32 _tag1, bytes32 _tag2, bytes32 _tag3, address _addressToPay) public returns (uint id) {
+  function issueBadge(string _data, address _owner, bytes32 _tag1, bytes32 _tag2, bytes32 _tag3, address _addressToPay) public returns(uint id) {
 
     Badge memory badge;
     badge.data = _data;
@@ -59,7 +54,6 @@ contract Rozet {
     BadgeIssued(badge.maker, _owner, id, _tag1, _tag2, _tag3, _data);
 
     return id;
-
   }
 
   function authenticateBadge(address _owner, uint _index) public {
@@ -80,13 +74,13 @@ contract Rozet {
           RozetToken rozetToken = RozetToken(addressOfRozetToken);
 
           // If transfer was sucessfull.
-          if (rozetToken.transferFrom(badge.maker, badge.addressToPay, authenticationPrice) ) {
+          if (rozetToken.transferFrom(badge.maker, badge.addressToPay, uint(rozetToken.badgePrice()))) {
             paymentWasMade = true;
           }
         }
       }
 
-      if((doesRequirePayment && paymentWasMade) || doesRequirePayment == false) {
+      if ((doesRequirePayment && paymentWasMade) || doesRequirePayment == false) {
         badge.isAuthenticated = true;
         profiles[_owner][_index] = badge;
         hasReputation[_owner] = true;
@@ -94,22 +88,18 @@ contract Rozet {
         createdAuthenticatedBadgeFor[badge.maker] = _owner;
       }
     }
-    else {
-      // This will only execute if the badge in question does not exist or
-      // a third party is trying to authentiate someone else's badge.
-    }
   }
 
-  function isBadgeAuthenticated(address _owner, uint _index) public constant returns (bool isAuthenticated) {
-      return profiles[_owner][_index].isAuthenticated;
+  function isBadgeAuthenticated(address _owner, uint _index) public constant returns(bool isAuthenticated) {
+    return profiles[_owner][_index].isAuthenticated;
   }
 
-  function getBadgeByID(uint id) constant public returns (string, address, address) {
+  function getBadgeByID(uint id) public constant returns(string, address, address) {
     return (allBadges[id].data, allBadges[id].maker, allBadges[id].owner);
   }
 
   // Get the badge of owner that lives at index.
-  function getBadge(address _owner, uint _index) constant public returns (string data, address maker, address owner) {
+  function getBadge(address _owner, uint _index) public constant returns(string data, address maker, address owner) {
 
     Badge[] storage callersProfile = profiles[_owner];
     Badge memory badge;
@@ -118,15 +108,14 @@ contract Rozet {
       badge.data = "Badge does not exist.";
       badge.maker = 0x0000000000000000000000000000000000000000;
       badge.owner = 0x0000000000000000000000000000000000000000;
-    }
-    else {
-      badge =  callersProfile[_index];
+    } else {
+      badge = callersProfile[_index];
     }
 
     return (badge.data, badge.maker, badge.owner);
   }
 
-  function getBadgesFrom(address _owner) constant public returns (uint[], address[], address[]) {
+  function getBadgesFrom(address _owner) public constant returns(uint[], address[], address[]) {
     Badge[] memory callersProfile = profiles[_owner];
     uint length = callersProfile.length;
 
@@ -135,7 +124,7 @@ contract Rozet {
     address[] memory ownersArray = new address[](length);
 
     for (uint i = 0; i < callersProfile.length; i++) {
-      Badge memory badge =  callersProfile[i];
+      Badge memory badge = callersProfile[i];
       idArray[i] = badge.id;
       makersArray[i] = badge.maker;
       ownersArray[i] = badge.owner;
@@ -144,7 +133,7 @@ contract Rozet {
     return (idArray, makersArray, ownersArray);
   }
 
-  function getBadges() constant public returns (uint[], address[], address[]) {
+  function getBadges() public constant returns(uint[], address[], address[]) {
     Badge[] memory callersProfile = profiles[msg.sender];
     uint length = callersProfile.length;
 
@@ -153,7 +142,7 @@ contract Rozet {
     address[] memory ownersArray = new address[](length);
 
     for (uint i = 0; i < callersProfile.length; i++) {
-      Badge memory badge =  callersProfile[i];
+      Badge memory badge = callersProfile[i];
       idArray[i] = badge.id;
       makersAddressArray[i] = badge.maker;
       ownersArray[i] = badge.owner;
@@ -162,7 +151,7 @@ contract Rozet {
     return (idArray, makersAddressArray, ownersArray);
   }
 
-  function getNumberOfBadges(address _owner) constant public returns (uint number) {
+  function getNumberOfBadges(address _owner) public constant returns(uint number) {
     return profiles[_owner].length;
   }
 }
