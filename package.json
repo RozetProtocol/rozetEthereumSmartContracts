@@ -1,7 +1,7 @@
 {
   "name": "RozetPlatform",
   "version": "1.0.0",
-  "description": "",
+  "description": "Rozet is a distributed, self-growing, autonomous reputation network built on Ethereum. It provides selective crowdsourcing which powers a previously inaccessible class of applications such as fraudless online voting and consumer reviews, ICO fraud analysis, SEO manipulation detection, CAPTCHA-less human verification, spam filtering, and more.",
   "main": "truffle.js",
   "directories": {
     "test": "test"
@@ -38,11 +38,23 @@
   },
   "dependencies": {
     "bluebird": "^3.5.1",
+    "ethereumjs-abi": "^0.6.5",
+    "ethers": "^3.0.16",
     "express": "^4.16.3",
+    "openzeppelin-solidity": "1.9.0",
     "queue": "^4.4.2",
     "solc": "^0.4.18",
     "testrpc": "0.0.1",
     "truffle-hdwallet-provider": "0.0.3",
     "zeppelin-solidity": "^1.4.0"
-  }
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/RozetPlatform/RozetPlatform.github.io.git"
+  },
+  "keywords": [],
+  "bugs": {
+    "url": "https://github.com/RozetPlatform/RozetPlatform.github.io/issues"
+  },
+  "homepage": "https://github.com/RozetPlatform/RozetPlatform.github.io#readme"
 }

@@ -126,6 +126,7 @@ let voterThree = web3.eth.accounts[4]
 function deployContract() {
   return RozetToken.new().then(function (_rozetToken) {
     rozetToken = _rozetToken;
+    return rozetToken.mint(tokenHolder, 1000);
   });
 }
 
@@ -135,26 +136,24 @@ contract('RozetToken', function (accounts) {
 
   describe('Basic functionality', function () {
 
-    it("Send Rozet Token", function () {
-      let initalBalanceOfReceiver = 0;
-      let amountToSend = 5;
-      return rozetToken.balanceOf.call(tokenReceiver).then(function (balance) {
-        initalBalanceOfReceiver += balance.toNumber();
-        return rozetToken.transfer(tokenReceiver, amountToSend, {
-          from: tokenHolder
-        });
-      }).then(function () {
-        return rozetToken.balanceOf.call(tokenReceiver);
-      }).then(function (newBalance) {
-        let expectedAmount = initalBalanceOfReceiver + amountToSend;
-        assert.equal(newBalance.toNumber(), expectedAmount,
-          "Amounts do not match.");
-      });
+    it("Send Rozet Token", async function () {
+
+      rozetToken.transfer(tokenReceiver, 10, {from: tokenHolder});
+      let recieved = await rozetToken.balanceOf(tokenReceiver);
+      recieved.should.be.bignumber.equal(10);
+      
     });
 
-    it("Withdraw Rozet Token", function () {
-      let initalBalanceOfReceiver = 0;
+    it("Withdraw Rozet Token", async function () {
       let amountToWithdraw = 5;
+      let initalBalanceOfReceiver = await rozetToken.balanceOf(tokenReceiver);
+      console.log(initalBalanceOfReceiver.toNumber())
+      await rozetToken.approve(tokenReceiver, amountToWithdraw);
+      await rozetToken.transferFrom(tokenHolder, tokenReceiver, amountToWithdraw, {from: tokenReceiver});
+      let newBalance = await rozetToken.balanceOf(tokenReceiver);
+      console.log(newBalance.toNumber())
+      newBalance.should.be.bignumber.equal(initalBalanceOfReceiver + amountToWithdraw);
+/*
       return rozetToken.balanceOf.call(tokenReceiver).then(function (balance) {
         initalBalanceOfReceiver += balance.toNumber();
         // Allow Receiver to take money from senders account whenever they want.
@@ -171,7 +170,7 @@ contract('RozetToken', function (accounts) {
         let expectedAmount = initalBalanceOfReceiver + amountToWithdraw;
         assert.equal(newBalance.toNumber(), expectedAmount,
           "Amounts do not match.");
-      });
+      });*/
     });
 
     it("Transfer to multiple accounts", async function () {
@@ -206,8 +205,6 @@ contract('RozetToken', function (accounts) {
       // 20 * 15 == 300
       assert.equal(totalWeightOfAllVoters, 300)
 
-
-
       await rozetToken.voteForBadgePrice(10, {
         from: voterTwo
       })
@@ -216,7 +213,6 @@ contract('RozetToken', function (accounts) {
       totalWeightOfAllVoters = await rozetToken.totalWeightOfAllVoters()
       // 300 + 5 * 10 = 350
       assert.equal(totalWeightOfAllVoters, 350)
-
 
     })
 
@@ -334,6 +330,8 @@ contract('RozetToken', function (accounts) {
     });
 
   });
+
+  // TODO add tests to test roz in different denominations for rozWei to RozEther
 
 
 });

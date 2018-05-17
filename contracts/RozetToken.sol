@@ -7,13 +7,19 @@ contract RozetToken {
     event Transfer(address indexed from, address indexed to, uint256 value);
     event Burn(address indexed burner, uint256 value);
     event Approval(address indexed owner, address indexed spender, uint256 value);
+    event Mint(address indexed to, uint256 amount);
+    event MintFinished();
+    address public owner;
+
+    bool public mintingFinished = false;
 
     using SafeMath for uint256;
 
     string public constant name = "Rozet";
     string public constant symbol = "ROZ";
     uint8 public constant decimals = 18;
-    uint256 public constant INITIAL_SUPPLY = 10000 * (10 ** uint256(decimals));
+    // This is the equivilant of 240 million Roz with 18 decimals or 240000000 * (10 ** uint256(decimals))
+    // uint256 public constant INITIAL_SUPPLY = 2.4e8 ether; 
     uint256 totalSupply_;
     int public totalWeightOfAllVoters;
     int public totalSupplyOfAllVoters;
@@ -24,12 +30,48 @@ contract RozetToken {
     mapping(address => mapping(address => uint256)) internal allowed;
     mapping(address => uint) public votesForBadgePrice;
 
-    function RozetToken() public {
+    constructor() public {
+        // The RozetGeneration contract will create this RozetToken contract and thus will be the only one able to mint tokens.
+        owner = msg.sender;
         datePriceCanBeUpdated = now;
         badgePrice = 20;
-        totalSupply_ = INITIAL_SUPPLY;
-        balances[msg.sender] = INITIAL_SUPPLY;
-        Transfer(0x0, msg.sender, INITIAL_SUPPLY);
+       // totalSupply_ = INITIAL_SUPPLY;
+       // balances[msg.sender] = INITIAL_SUPPLY;
+       // Transfer(0x0, msg.sender, INITIAL_SUPPLY);
+    }
+
+    modifier canMint() {
+        require(!mintingFinished);
+        _;
+    }
+
+    modifier onlyOwner() {
+        require(msg.sender == owner);
+        _;
+    }
+
+    /**
+    * @dev Function to mint tokens
+    * @param _to The address that will receive the minted tokens.
+    * @param _amount The amount of tokens to mint.
+    * @return A boolean that indicates if the operation was successful.
+    */
+    function mint(address _to, uint256 _amount) onlyOwner canMint public returns (bool) {
+        totalSupply_ = totalSupply_.add(_amount);
+        balances[_to] = balances[_to].add(_amount);
+        emit Mint(_to, _amount);
+        emit Transfer(address(0), _to, _amount);
+        return true;
+    }
+
+    /**
+    * @dev Function to stop minting new tokens.
+    * @return True if the operation was successful.
+    */
+    function finishMinting() onlyOwner canMint public returns (bool) {
+        mintingFinished = true;
+        emit MintFinished();
+        return true;
     }
 
     function totalSupply() public view returns(uint256) {
@@ -117,7 +159,7 @@ contract RozetToken {
      */
     function approve(address _spender, uint256 _value) public returns(bool) {
         allowed[msg.sender][_spender] = _value;
-        Approval(msg.sender, _spender, _value);
+        emit Approval(msg.sender, _spender, _value);
         return true;
     }
 
@@ -127,7 +169,7 @@ contract RozetToken {
 
     function increaseApproval(address _spender, uint _addedValue) public returns(bool) {
         allowed[msg.sender][_spender] = allowed[msg.sender][_spender].add(_addedValue);
-        Approval(msg.sender, _spender, allowed[msg.sender][_spender]);
+        emit Approval(msg.sender, _spender, allowed[msg.sender][_spender]);
         return true;
     }
 
@@ -138,7 +180,7 @@ contract RozetToken {
         } else {
             allowed[msg.sender][_spender] = oldValue.sub(_subtractedValue);
         }
-        Approval(msg.sender, _spender, allowed[msg.sender][_spender]);
+        emit Approval(msg.sender, _spender, allowed[msg.sender][_spender]);
         return true;
     }
 
@@ -152,7 +194,7 @@ contract RozetToken {
         balances[_from] = balances[_from].sub(_value);
         balances[_to] = balances[_to].add(_value);
         allowed[_from][msg.sender] = allowed[_from][msg.sender].sub(_value);
-        Transfer(_from, _to, _value);
+        emit Transfer(_from, _to, _value);
         return true;
     }
 
@@ -166,7 +208,7 @@ contract RozetToken {
         balances[msg.sender] = balances[msg.sender].sub(_value);
         balances[_to] = balances[_to].add(_value);
 
-        Transfer(msg.sender, _to, _value);
+        emit Transfer(msg.sender, _to, _value);
         return true;
     }
 
@@ -185,7 +227,7 @@ contract RozetToken {
         address burner = msg.sender;
         balances[burner] = balances[burner].sub(_value);
         totalSupply_ = totalSupply_.sub(_value);
-        Burn(burner, _value);
-        Transfer(burner, address(0), _value);
+        emit Burn(burner, _value);
+        emit Transfer(burner, address(0), _value);
     }
 }
