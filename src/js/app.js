@@ -17,10 +17,10 @@
 wrie this as a .json string in data 
 */
 
-//let RozetABI = require('./RozetABI.json');
-import RozetABI from "./RozetABI.json";
-import Web3 from "web3";
-//let Web3 = require('web3');
+let RozetABI = require('./RozetABI.json');
+//import RozetABI from "./RozetABI.json";
+//import Web3 from "web3";
+let Web3 = require('web3');
 
 
 //import Promise from "bluebird";

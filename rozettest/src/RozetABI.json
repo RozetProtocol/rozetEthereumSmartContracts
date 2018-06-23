@@ -1,152 +1,5 @@
 [
 	{
-		"anonymous": false,
-		"inputs": [
-			{
-				"indexed": false,
-				"name": "maker",
-				"type": "address"
-			},
-			{
-				"indexed": false,
-				"name": "recipient",
-				"type": "address"
-			},
-			{
-				"indexed": false,
-				"name": "id",
-				"type": "uint256"
-			},
-			{
-				"indexed": false,
-				"name": "tag1",
-				"type": "bytes32"
-			},
-			{
-				"indexed": false,
-				"name": "tag2",
-				"type": "bytes32"
-			},
-			{
-				"indexed": false,
-				"name": "tag3",
-				"type": "bytes32"
-			},
-			{
-				"indexed": false,
-				"name": "data",
-				"type": "string"
-			}
-		],
-		"name": "BadgeIssued",
-		"type": "event"
-	},
-	{
-		"constant": false,
-		"inputs": [
-			{
-				"name": "_recipient",
-				"type": "address"
-			},
-			{
-				"name": "_index",
-				"type": "uint256"
-			}
-		],
-		"name": "authenticateBadge",
-		"outputs": [],
-		"payable": false,
-		"stateMutability": "nonpayable",
-		"type": "function"
-	},
-	{
-		"constant": false,
-		"inputs": [
-			{
-				"name": "_data",
-				"type": "string"
-			},
-			{
-				"name": "_recipient",
-				"type": "address"
-			},
-			{
-				"name": "_sender",
-				"type": "address"
-			},
-			{
-				"name": "_tag1",
-				"type": "bytes32"
-			},
-			{
-				"name": "_tag2",
-				"type": "bytes32"
-			},
-			{
-				"name": "_tag3",
-				"type": "bytes32"
-			},
-			{
-				"name": "_addressToPay",
-				"type": "address"
-			}
-		],
-		"name": "issueBadge",
-		"outputs": [
-			{
-				"name": "id",
-				"type": "uint256"
-			}
-		],
-		"payable": false,
-		"stateMutability": "nonpayable",
-		"type": "function"
-	},
-	{
-		"inputs": [
-			{
-				"name": "_addressOfRozetToken",
-				"type": "address"
-			}
-		],
-		"payable": false,
-		"stateMutability": "nonpayable",
-		"type": "constructor"
-	},
-	{
-		"constant": true,
-		"inputs": [],
-		"name": "addressOfRozetToken",
-		"outputs": [
-			{
-				"name": "",
-				"type": "address"
-			}
-		],
-		"payable": false,
-		"stateMutability": "view",
-		"type": "function"
-	},
-	{
-		"constant": true,
-		"inputs": [
-			{
-				"name": "",
-				"type": "address"
-			}
-		],
-		"name": "createdAuthenticatedBadgeFor",
-		"outputs": [
-			{
-				"name": "",
-				"type": "address"
-			}
-		],
-		"payable": false,
-		"stateMutability": "view",
-		"type": "function"
-	},
-	{
 		"constant": true,
 		"inputs": [
 			{
@@ -171,55 +24,6 @@
 			{
 				"name": "recipient",
 				"type": "address"
-			}
-		],
-		"payable": false,
-		"stateMutability": "view",
-		"type": "function"
-	},
-	{
-		"constant": true,
-		"inputs": [
-			{
-				"name": "id",
-				"type": "uint256"
-			}
-		],
-		"name": "getBadgeByID",
-		"outputs": [
-			{
-				"name": "",
-				"type": "string"
-			},
-			{
-				"name": "",
-				"type": "address"
-			},
-			{
-				"name": "",
-				"type": "address"
-			}
-		],
-		"payable": false,
-		"stateMutability": "view",
-		"type": "function"
-	},
-	{
-		"constant": true,
-		"inputs": [],
-		"name": "getBadges",
-		"outputs": [
-			{
-				"name": "",
-				"type": "uint256[]"
-			},
-			{
-				"name": "",
-				"type": "address[]"
-			},
-			{
-				"name": "",
-				"type": "address[]"
 			}
 		],
 		"payable": false,
@@ -257,67 +61,6 @@
 		"constant": true,
 		"inputs": [
 			{
-				"name": "_recipient",
-				"type": "address"
-			}
-		],
-		"name": "getNumberOfBadges",
-		"outputs": [
-			{
-				"name": "number",
-				"type": "uint256"
-			}
-		],
-		"payable": false,
-		"stateMutability": "view",
-		"type": "function"
-	},
-	{
-		"constant": true,
-		"inputs": [
-			{
-				"name": "",
-				"type": "address"
-			}
-		],
-		"name": "hasReputation",
-		"outputs": [
-			{
-				"name": "",
-				"type": "bool"
-			}
-		],
-		"payable": false,
-		"stateMutability": "view",
-		"type": "function"
-	},
-	{
-		"constant": true,
-		"inputs": [
-			{
-				"name": "_recipient",
-				"type": "address"
-			},
-			{
-				"name": "_index",
-				"type": "uint256"
-			}
-		],
-		"name": "isBadgeAuthenticated",
-		"outputs": [
-			{
-				"name": "isAuthenticated",
-				"type": "bool"
-			}
-		],
-		"payable": false,
-		"stateMutability": "view",
-		"type": "function"
-	},
-	{
-		"constant": true,
-		"inputs": [
-			{
 				"name": "",
 				"type": "address"
 			},
@@ -331,18 +74,6 @@
 			{
 				"name": "data",
 				"type": "string"
-			},
-			{
-				"name": "tag1",
-				"type": "bytes32"
-			},
-			{
-				"name": "tag2",
-				"type": "bytes32"
-			},
-			{
-				"name": "tag3",
-				"type": "bytes32"
 			},
 			{
 				"name": "maker",
@@ -377,6 +108,71 @@
 		"constant": true,
 		"inputs": [
 			{
+				"name": "",
+				"type": "address"
+			}
+		],
+		"name": "createdAuthenticatedBadgeFor",
+		"outputs": [
+			{
+				"name": "",
+				"type": "address"
+			}
+		],
+		"payable": false,
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"constant": true,
+		"inputs": [
+			{
+				"name": "_recipient",
+				"type": "address"
+			}
+		],
+		"name": "getNumberOfBadges",
+		"outputs": [
+			{
+				"name": "number",
+				"type": "uint256"
+			}
+		],
+		"payable": false,
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"constant": true,
+		"inputs": [
+			{
+				"name": "id",
+				"type": "uint256"
+			}
+		],
+		"name": "getBadgeByID",
+		"outputs": [
+			{
+				"name": "",
+				"type": "string"
+			},
+			{
+				"name": "",
+				"type": "address"
+			},
+			{
+				"name": "",
+				"type": "address"
+			}
+		],
+		"payable": false,
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"constant": false,
+		"inputs": [
+			{
 				"name": "v",
 				"type": "uint8"
 			},
@@ -387,9 +183,179 @@
 			{
 				"name": "s",
 				"type": "bytes32"
+			},
+			{
+				"name": "sender",
+				"type": "address"
+			},
+			{
+				"name": "recipient",
+				"type": "address"
+			},
+			{
+				"name": "addressToPay",
+				"type": "address"
+			},
+			{
+				"name": "data",
+				"type": "string"
 			}
 		],
-		"name": "verify",
+		"name": "issueBadgeFromSignature",
+		"outputs": [
+			{
+				"name": "id",
+				"type": "uint256"
+			}
+		],
+		"payable": false,
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"constant": true,
+		"inputs": [],
+		"name": "getBadges",
+		"outputs": [
+			{
+				"name": "",
+				"type": "uint256[]"
+			},
+			{
+				"name": "",
+				"type": "address[]"
+			},
+			{
+				"name": "",
+				"type": "address[]"
+			}
+		],
+		"payable": false,
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"constant": true,
+		"inputs": [
+			{
+				"name": "_recipient",
+				"type": "address"
+			},
+			{
+				"name": "_index",
+				"type": "uint256"
+			}
+		],
+		"name": "isBadgeAuthenticated",
+		"outputs": [
+			{
+				"name": "isAuthenticated",
+				"type": "bool"
+			}
+		],
+		"payable": false,
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"constant": false,
+		"inputs": [
+			{
+				"name": "_sender",
+				"type": "address"
+			},
+			{
+				"name": "_recipient",
+				"type": "address"
+			},
+			{
+				"name": "_addressToPay",
+				"type": "address"
+			},
+			{
+				"name": "_data",
+				"type": "string"
+			}
+		],
+		"name": "issueBadge",
+		"outputs": [
+			{
+				"name": "",
+				"type": "uint256"
+			}
+		],
+		"payable": false,
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"constant": true,
+		"inputs": [
+			{
+				"name": "",
+				"type": "address"
+			}
+		],
+		"name": "hasReputation",
+		"outputs": [
+			{
+				"name": "",
+				"type": "bool"
+			}
+		],
+		"payable": false,
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"constant": true,
+		"inputs": [
+			{
+				"name": "recipient",
+				"type": "address"
+			}
+		],
+		"name": "getMostRecentBadge",
+		"outputs": [
+			{
+				"name": "",
+				"type": "string"
+			},
+			{
+				"name": "",
+				"type": "address"
+			},
+			{
+				"name": "",
+				"type": "address"
+			}
+		],
+		"payable": false,
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"constant": false,
+		"inputs": [
+			{
+				"name": "_recipient",
+				"type": "address"
+			},
+			{
+				"name": "_index",
+				"type": "uint256"
+			}
+		],
+		"name": "receiveBadge",
+		"outputs": [],
+		"payable": false,
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"constant": true,
+		"inputs": [],
+		"name": "rozetToken",
 		"outputs": [
 			{
 				"name": "",
@@ -397,7 +363,45 @@
 			}
 		],
 		"payable": false,
-		"stateMutability": "pure",
+		"stateMutability": "view",
 		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"name": "_addressOfRozetToken",
+				"type": "address"
+			}
+		],
+		"payable": false,
+		"stateMutability": "nonpayable",
+		"type": "constructor"
+	},
+	{
+		"anonymous": false,
+		"inputs": [
+			{
+				"indexed": false,
+				"name": "maker",
+				"type": "address"
+			},
+			{
+				"indexed": false,
+				"name": "recipient",
+				"type": "address"
+			},
+			{
+				"indexed": false,
+				"name": "id",
+				"type": "uint256"
+			},
+			{
+				"indexed": false,
+				"name": "data",
+				"type": "string"
+			}
+		],
+		"name": "BadgeIssued",
+		"type": "event"
 	}
 ]

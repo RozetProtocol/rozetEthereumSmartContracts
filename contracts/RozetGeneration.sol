@@ -1,5 +1,5 @@
 
-pragma solidity ^0.4.18;
+pragma solidity ^ 0.4.24;
 
 import "./Rozet.sol";
 import "./RozetToken.sol";
@@ -33,7 +33,6 @@ contract RozetGeneration {
 
   bool public isFinalized = false;
 
-
   RozetToken public rozetToken;
   RozetTimelock public rozetTimelock;
 
@@ -47,33 +46,18 @@ contract RozetGeneration {
     require(block.timestamp >= openingTime && block.timestamp <= closingTime);
     _;
   }
-  //  Rozet public rozet;
 
-// TODO update all linkns to our github, new address is RozetProtocol not Platform 
-  // Add proof of stake to elect super users trusted nodes. max 100 
-  // TODO add indivual cap
-  // TODO add whitelisting
-  // TODO add cap to rozetToken so max num of  mintable tokens that can be made
-  // TODO what happens if round 1 cap is 10 eth and we have raised 9 eth so far and somone gives us two eth. do they get round 1 rate for the total sale?
-
-  // attack, A issues badge to B and then they authenticate and A gets paid... by stealing from our site... 
-
-  // Issue 4 badges
-  // Add a field to a abdge that says "for authentication" or "not for authentication" in the case that someone gets 4 badges 
-  // From the same person and only wnats two of them to be authenticated. 
-
-  // Can we authenticate senders not makers without being cheated?? 
-// TODO add array of a recipient's trusted badge makers that can be added to and removed from at anytime 
   event Finalized();
   event TokenPurchase(address indexed purchaser, address indexed beneficiary, uint256 value, uint256 amount);
 
-  // "0x692a70d2e424a56d2c6c27aa97d1a86395877b3a", "0xFa9B0D8BB3e4cCdF443467C9eAF08f3b95420cB7", "0xFa9B0D8BB3e4cCdF443467C9eAF08f3b95420cB7", "0xFa9B0D8BB3e4cCdF443467C9eAF08f3b95420cB7", "0xFa9B0D8BB3e4cCdF443467C9eAF08f3b95420cB7" 
+  // "0x692a70d2e424a56d2c6c27aa97d1a86395877b3a", "0xFa9B0D8BB3e4cCdF443467C9eAF08f3b95420cB7", "0xFa9B0D8BB3e4cCdF443467C9eAF08f3b95420cB7", "0xFa9B0D8BB3e4cCdF443467C9eAF08f3b95420cB7", "0xFa9B0D8BB3e4cCdF443467C9eAF08f3b95420cB7"
   constructor(address _founderOne, address _founderTwo, address _founderThree, address _partnerOne, address _partnerTwo, address _operationsAddress) public {
-    
+
     // solium-disable-next-line security/no-block-members
     // require(_openingTime >= block.timestamp);
     // require(_closingTime >= _openingTime);
 
+    // TODO get rid of plus 1?
     openingTime = now + 1;
     roundOneStartDate = now;
     roundTwoStartDate = roundOneStartDate + 4 weeks;
@@ -83,10 +67,10 @@ contract RozetGeneration {
 
     rozetToken = new RozetToken();
 
-    uint timelockReleaseDate = now + 1 years;
+    uint timelockReleaseDate = now + 365 days;
     rozetTimelock = new RozetTimelock(rozetToken, _founderOne, _founderTwo, _founderThree, timelockReleaseDate);
 
-    // Create the Rozet reputation database and ensure that it can only be used with offical Rozet tokens. 
+    // Create the Rozet reputation database and ensure that it can only be used with offical Rozet tokens.
     // rozet = new Rozet(address(rozetToken));
 
     // Establish the addresses of each Rozet founder and partner.
@@ -97,18 +81,20 @@ contract RozetGeneration {
     partnerTwo = _partnerTwo;
     operations = _operationsAddress;
 
-    // Rate is approximatly 10c per Roz or 100 Roz per USD (assuming Ether is at $650). 
-    // This translates to 152,358,055,378,460 wei per Rozet token. 
+    // Rate is approximatly 10c per Roz or 100 Roz per USD (assuming Ether is at $650).
+    // This translates to 152,358,055,378,460 wei per Rozet token.
     // Or 1 Eth per 6563.5 Roz.
     rate = 152358055378460;
 
     // The maximum amount of ether to be raised is approximatly 20 million USD or 30k Ether (assuming %650 per ether).
     cap = 30000 ether;
 
+    // TODO remove this. why did open zeplin have this?
     weiRaised = 0;
 
   }
 
+  // TODO waht if we reach the cap before the closing time and we want to finalize early.
   function hasClosed() public view returns (bool) {
     // solium-disable-next-line security/no-block-members
     return block.timestamp > closingTime;
@@ -118,16 +104,17 @@ contract RozetGeneration {
     buyTokens(msg.sender);
   }
 
-  function buyTokens(address _beneficiary) public payable {
+  function buyTokens(address _beneficiary) public payable { // TODO add this here onlyWhileOpen
 
     uint256 weiAmount = msg.value;
 
     require(_beneficiary != address(0));
     require(weiAmount != 0);
-    require(weiRaised.add(weiAmount) <= cap);
+    require(weiRaised.add(weiAmount) <= cap, "Can not sell over cap.");
+    // TODO add check to make sure that token sale is open
 
     uint tokenAmount = getAmountOfRozForEth(weiAmount);
-    
+
     weiRaised = weiRaised.add(weiAmount);
 
     tokensSold += tokenAmount;
@@ -157,11 +144,12 @@ contract RozetGeneration {
     uint bonus = getBonus(round);
 
     // Appply the bonus to the rate.
+    // TODO change to safe math
     return rate + (rate * bonus / 100);
   }
 
   function getRound() public view returns (uint256) {
-    // The round is advanced when that round's end date is reached or that round's sale cap is reached, which ever comes first. 
+    // The round is advanced when that round's end date is reached or that round's sale cap is reached, which ever comes first.
 
     // Determine what round we could be in based on the current date.
     uint roundBasedOnTime;
@@ -243,11 +231,9 @@ contract RozetGeneration {
 
   function finalize() onlyFounders public {
     require(!isFinalized);
-    require(hasClosed());
-
+    require(hasClosed()); // TODO this could be a problem if we finsish the sale super early
     finalization();
     emit Finalized();
-
     isFinalized = true;
   }
 
@@ -257,19 +243,21 @@ contract RozetGeneration {
     uint totalSupply = rozetToken.totalSupply();
     totalSupply = totalSupply * 55 / 100;
 
-    // Allocate 10% of the total supply to founders, locked for one year. 
+    // Allocate 10% of the total supply to founders, locked for one year.
     founderAllocation = totalSupply * 10 / 100;
     rozetToken.mint(rozetTimelock, founderAllocation);
 
-    // Allocate 3% of tokens to partner one. 
+    // Allocate 3% of tokens to partner one.
     rozetToken.mint(partnerOne, (totalSupply * 3 / 100));
 
-    // Allocate 2% of tokens to partner two. 
+    // Allocate 2% of tokens to partner two.
     rozetToken.mint(partnerTwo, (totalSupply * 2 / 100));
+
+    // TODO probe gonna need operations to be some kind of multisig
 
     // Allocate 40% of tokens for future work.
     rozetToken.mint(operations, (totalSupply * 40 / 100));
   }
 
- 
+
 }
