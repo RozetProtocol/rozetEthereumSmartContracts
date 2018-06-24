@@ -7,28 +7,6 @@ contract Rozet {
   // "0xcea271df25a47087252da2fe9b7d6d9152f0c98a"
   RozetToken public rozetToken;
 
-  // Actions such as issuing and receiving badges require a stake or payment of roz.
-  // Stake[] public allStakes;
-  // mapping(address => uint[]) internal stakeLenderToStakeId;
-  // mapping(address => uint) internal stakeHolderToAmount;
-
-  // uint constant public tierTwoStake = 1 ether; // 1 Roz
-  // uint constant public tierThreeStake = tierTwoStake * 10;
-  // uint constant public tierFourStake = tierThreeStake * 10;
-  // uint constant public stakeTime = 3 days;
-
-  /*
-  struct Stake {
-    address stakeHolder;
-    address stakeBeneficiary;
-    uint amount;
-    uint timeStaked;
-    bool isReleased;
-  }*/
-
-
-
-
   struct Badge {
     string senderData;
     string recipientData;
@@ -76,39 +54,42 @@ contract Rozet {
     string data2;
   }
 
+  // DNS needs a two way mapping otherwise different addresses can claim the same name.
+  mapping(address => bytes32) public addressToName;
+  mapping(bytes32 => address) public nameToAddress;
+
+  function getNameFromAddress(address _address) public view returns (bytes32) {
+    return addressToName[_address];
+  }
+
+  function getAddressFromName(bytes32 _name) public view returns (address) {
+    return nameToAddress[_name];
+  }
+
+  function getDNSFee() public view returns (uint) {
+    return uint(rozetToken.badgePrice()) * 100;
+  }
+
+  function setName(bytes32 DNSName) public {
+    // Require that the name has not already been taken. Note this require makes names unchangeable.
+    require(nameToAddress[DNSName] == 0x0000000000000000000000000000000000000000);
+    // The DNS requires a roz fee to prevent squaters from stealing all the names.
+    uint rozFee = getDNSFee();
+    // Give the rozFee to a semi-random voter as a reward for voting.
+    address[] memory voters = rozetToken.getVoters();
+    uint index = uint(blockhash(block.number - 1)) % (voters.length);
+    address voter = voters[index];
+
+    require(rozetToken.transferFrom(msg.sender, voter, rozFee));
+    addressToName[msg.sender] = DNSName;
+    nameToAddress[DNSName] = msg.sender;
+  }
+
   mapping(address => Profile) public addressToProfile;
 
   constructor(address _addressOfRozetToken) public {
     rozetToken = RozetToken(_addressOfRozetToken);
   }
-  /*
-  function stakesOf(address lender) public view returns(uint256[]) {
-      return stakeLenderToStakeId[lender];
-  }
-
-  function stakeTokens(address _stakeBeneficiary, uint amount) public {
-      // If the user did not approve this transfer this call will fail and the stake will not occur.
-      require(rozetToken.transferFrom(msg.sender, this, amount), "Could not transfer tokens.");
-      Stake memory stake;
-      stake.stakeHolder = msg.sender;
-      stake.stakeBeneficiary = _stakeBeneficiary;
-      stake.amount = amount;
-      stakeHolderToAmount[_stakeBeneficiary] += amount;
-      stake.timeStaked = now;
-      stake.isReleased = false;
-      uint id = allStakes.push(stake) - 1;
-      stakeLenderToStakeId[msg.sender].push(id);
-  }
-
-  function releaseStakedTokens(uint id) public {
-    Stake memory stake = allStakes[id];
-    require(stake.stakeHolder == msg.sender, "Only the stake holder can release.");
-    require(now > stake.timeStaked + stakeTime);
-    require(stake.isReleased == false);
-    stake.isReleased = true;
-    allStakes[id] = stake;
-    rozetToken.transfer(msg.sender, stake.amount);
-  }*/
 
   function hasEnoughStakeToIssue(address user) public view returns (bool) {
     return hasEnoughStake(user, issuedBadges[user]);
@@ -116,6 +97,18 @@ contract Rozet {
 
   function hasEnoughStakeToReceive(address user) public view returns (bool) {
     return hasEnoughStake(user, receivedBadges[user]);
+  }
+
+  function tierTwoRequirement() public view returns (uint) {
+    return rozetToken.stakeRequirement();
+  }
+
+  function tierThreeRequirement() public view returns (uint) {
+    return rozetToken.stakeRequirement() * 10;
+  }
+
+  function tierFourRequirement() public view returns (uint) {
+    return rozetToken.stakeRequirement() * 100;
   }
 
   function hasEnoughStake(address user, uint[] badges) internal view returns (bool) {
@@ -134,14 +127,14 @@ contract Rozet {
     else if (numberOfBadges >= 100 && numberOfBadges < 1000) {
       uint oneHundrethBadgeId = badges[numberOfBadges - 100];
       if (allBadges[oneHundrethBadgeId].timeIssued > now - 1 days) {
-        userHasEnoughStake = stakeAmount >= rozetToken.stakeRequirement() * 10;
+        userHasEnoughStake = stakeAmount >= tierThreeRequirement();
       }
     }
     // Tier 4 staking is required for 1,000 or more actions per day.
     else if (numberOfBadges >= 1000) {
       uint oneThousandthBadgeId = badges[numberOfBadges - 1000];
       if (allBadges[oneThousandthBadgeId].timeIssued > now - 1 days) {
-        userHasEnoughStake = stakeAmount >= rozetToken.stakeRequirement() * 100;
+        userHasEnoughStake = stakeAmount >= tierFourRequirement();
       }
     }
     return userHasEnoughStake;
@@ -293,16 +286,6 @@ contract Rozet {
     tag = badge.tag;
 
   }
-  /*
-  function getStakeById(uint id) public constant returns (address stakeHolder, address stakeBeneficiary, uint amount,
-    uint timeStaked, bool isReleased) {
-      Stake memory stake = allStakes[id];
-      stakeHolder = stake.stakeHolder;
-      stakeBeneficiary = stake.stakeBeneficiary;
-      amount = stake.amount;
-      timeStaked = stake.timeStaked;
-      isReleased = stake.isReleased;
-    }*/
 
   function badgesOf(address user) public view returns(uint[]) {
     return usersBadges[user];

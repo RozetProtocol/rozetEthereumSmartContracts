@@ -278,44 +278,5 @@ contract('RozetToken', function(accounts) {
         })
 
     })
-/*
-    describe('DNS', function() {
 
-        before(deployContract)
-
-        it('Purchace name from the DNS.', async function() {
-            // Token holder gives all his Roz to voter one.
-            let balanceOfTokenHolder = await rozetToken.balanceOf(tokenHolder)
-            await rozetToken.transfer(voterOne, balanceOfTokenHolder.toNumber(), {
-                from: tokenHolder
-            })
-            let balanceOfVoterOne = await rozetToken.balanceOf(voterOne)
-            await rozetToken.setName("Name to set", {
-                from: voterOne
-            })
-            let name = await rozetToken.getNameFromAddress(voterOne)
-            name = web3.toAscii(name).substring(0, "Name to set".length)
-            let address = await rozetToken.getAddressFromName("Name to set")
-            name.should.be.equal("Name to set")
-            address.should.be.equal(voterOne)
-        })
-
-        it('DNS fee should be distributed.', async function() {
-            let fee = await rozetToken.getDNSFee()
-            let balanceOfTokenHolder = await rozetToken.balanceOf(tokenHolder)
-            fee.should.be.bignumber.equal(balanceOfTokenHolder)
-        })
-
-        it('Should not be able to buy DNS name without payment.', async function() {
-            // VoterTwo has no roz.
-            await rozetToken.setName("Name to set", {
-                form: voterTwo
-            }).should.be.rejectedWith('revert')
-        })
-
-
-
-    })
-
-*/
 })

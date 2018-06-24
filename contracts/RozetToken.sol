@@ -53,10 +53,6 @@ contract RozetToken {
       uint stakeVote;
     }
 
-    // DNS needs a two way mapping otherwise different addresses can claim the same name.
-    mapping(address => bytes32) public addressToName;
-    mapping(bytes32 => address) public nameToAddress;
-
     /*
       This hard limit on votes can not be circumvented by creating multiple accounts since each account is tied to a reputation.
       Votes cast by accounts with no reputation will be ignored by reputation algorithms.
@@ -101,8 +97,11 @@ contract RozetToken {
     constructor() public {
         // The RozetGeneration contract will create this RozetToken contract and thus will be the only one able to mint tokens.
         owner = msg.sender;
+        // The defulat badge price and stake requirements will be updated via token holder's voting. 
         badgePrice = 1 ether; // 1 roz
+        stakeRequirement = 10 ether; //10 roz
         voters.push(msg.sender);
+
     }
 
   //  requiredStakeForActions(uint tier) public view returns (uint) {
@@ -243,33 +242,7 @@ contract RozetToken {
       return voters;
     }
 
-    function getNameFromAddress(address _address) public view returns (bytes32) {
-      return addressToName[_address];
-    }
 
-    function getAddressFromName(bytes32 _name) public view returns (address) {
-      return nameToAddress[_name];
-    }
-
-    function getDNSFee() public view returns (uint) {
-      return uint(badgePrice) * 100;
-    }
-
-    function setName(bytes32 DNSName) public {
-      // Require that the name has not already been taken. Note this require makes names unchangeable.
-      require(nameToAddress[DNSName] == 0x0000000000000000000000000000000000000000);
-      // The DNS requires a roz fee to prevent squaters from stealing all the names.
-      uint rozFee = getDNSFee();
-      require(balances[msg.sender] > rozFee);
-      // Give the rozFee to a semi-random voter as a reward for voting.
-      uint index = uint(blockhash(block.number - 1)) % (voters.length);
-      address voter = voters[index];
-      balances[msg.sender] = balances[msg.sender].sub(rozFee);
-      balances[voter] = balances[voter].add(rozFee);
-      emit Transfer(msg.sender, voter, rozFee);
-      addressToName[msg.sender] = DNSName;
-      nameToAddress[DNSName] = msg.sender;
-    }
 
     /**
     * @dev Function to mint tokens
