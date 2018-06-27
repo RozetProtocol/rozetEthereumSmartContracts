@@ -57,7 +57,7 @@ contract RozetGeneration {
     // require(_openingTime >= block.timestamp);
     // require(_closingTime >= _openingTime);
 
-    // TODO get rid of plus 1?
+    // SafeMath is not needed for these operations.
     openingTime = now + 1;
     roundOneStartDate = now;
     roundTwoStartDate = roundOneStartDate + 4 weeks;
@@ -144,8 +144,7 @@ contract RozetGeneration {
     uint bonus = getBonus(round);
 
     // Appply the bonus to the rate.
-    // TODO change to safe math
-    return rate + (rate * bonus / 100);
+    return rate.add(rate.mul(bonus.div(100)));
   }
 
   function getRound() public view returns (uint256) {
@@ -223,7 +222,7 @@ contract RozetGeneration {
   }
 
   function withdraw() onlyFounders public  {
-    uint amountToSend = address(this).balance / 3;
+    uint amountToSend = address(this).balance.div(3);
     founderOne.transfer(amountToSend);
     founderTwo.transfer(amountToSend);
     founderThree.transfer(amountToSend);
@@ -238,8 +237,9 @@ contract RozetGeneration {
   }
 
   function finalization() internal {
+    // Dont need SafeMath since totalSupply is limited. 
 
-    // The total supply will be all tokens minted so far plus another 55% to be divided amoung founders, partners, and operations.
+    // The total supply will be all tokens minted so far add another 55% to be divided amoung founders, partners, and operations.
     uint totalSupply = rozetToken.totalSupply();
     totalSupply = totalSupply * 55 / 100;
 

@@ -22,8 +22,7 @@ contract Rozet {
     // In the event that sponsors issue a badge to a user they must pay one of the beneficiaries on one of the users received badges.
     address beneficiary;
     uint timeIssued;
-    // The tag field is optional and can be used to allow on-chain reputation algorithms help when sorting and indexing badges.
-    string tag;
+
   }
 
   Badge[] public allBadges;
@@ -57,6 +56,26 @@ contract Rozet {
   // DNS needs a two way mapping otherwise different addresses can claim the same name.
   mapping(address => bytes32) public addressToName;
   mapping(bytes32 => address) public nameToAddress;
+
+  // Trusted sponsors can be chosen by a user if they want to allow a sponsor to issue badges on their behalf without the need to sign each request.
+  uint constant public numberOfTrustedSponsors = 1000;
+  mapping(address => address[numberOfTrustedSponsors]) public trustedSponsors;
+
+  /*
+    A sponsor can issue a badge on a sender's behalf. This benifits the sender since they can issue badges
+    without the need for a node or connection to a node (metamask), however the tradeoff is that the sponsor must be trusted.
+    updateTrustedSponsor allows a user to retroactivly mark a sponsor as trusted or not. This will aid reputation algorithms when assessing
+    the verasity of a badge issued by a sponsor. Note that a sender also has the option of signing a badge offline, this avoids gas fees,
+    but still requires the use of metamask or some other signing software.
+  */
+  function setTrustedSponsor(address sponsor, uint index) public {
+    require(index < numberOfTrustedSponsors && index >= 0);
+    trustedSponsors[msg.sender][index] = sponsor;
+  }
+
+  function getTrustedSponsors(address user) public view returns (address[numberOfTrustedSponsors]) {
+    return trustedSponsors[user];
+  }
 
   function getNameFromAddress(address _address) public view returns (bytes32) {
     return addressToName[_address];
@@ -112,6 +131,7 @@ contract Rozet {
   }
 
   function hasEnoughStake(address user, uint[] badges) internal view returns (bool) {
+    // The subs in this function do not need SafeMath due to their own checks.
     // Tier 1. Tier 1 is the free tier. Users are eligible for the free tier for up to five actions per day.
     bool userHasEnoughStake = true;
     uint numberOfBadges = badges.length;
@@ -207,7 +227,7 @@ contract Rozet {
 
   // "0xf06162929767F6a7779af9339687023cf2351fc5", "0xf06162929767F6a7779af9339687023cf2351fc5", "0xf06162929767F6a7779af9339687023cf2351fc5", "test badge data"
   // Create a new badge and assign it to recipient.
-  function issueBadge(address _sender, address _recipient, address _beneficiary, string _data, string _tag) public returns(uint id) {
+  function issueBadge(address _sender, address _recipient, address _beneficiary, string _data) public returns(uint id) {
 
     // Non-receivable badges (i.e. badges with no beneficiary) do not require stake to issue.
     if (_beneficiary != 0x0000000000000000000000000000000000000000) {
@@ -221,7 +241,6 @@ contract Rozet {
     badge.recipient = _recipient;
     badge.beneficiary = _beneficiary;
     badge.timeIssued = now;
-    badge.tag = _tag;
 
     if (msg.sender == _sender) {
       badge.senderSigned = true;
@@ -271,7 +290,7 @@ contract Rozet {
   }
 
   function getBadgeById(uint id) public constant returns (string senderData, string recipientData, address sponsor, address sender,
-    address recipient, bool recipientSigned, bool senderSigned, address beneficiary, uint timeIssued, string tag) {
+    address recipient, bool recipientSigned, bool senderSigned, address beneficiary, uint timeIssued) {
     Badge memory badge = allBadges[id];
 
     senderData = badge.senderData;
@@ -283,7 +302,6 @@ contract Rozet {
     senderSigned = badge.senderSigned;
     beneficiary = badge.beneficiary;
     timeIssued = badge.timeIssued;
-    tag = badge.tag;
 
   }
 

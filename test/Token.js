@@ -57,7 +57,7 @@ contract('RozetToken', function(accounts) {
             newBalance.should.be.bignumber.equal(initalBalanceOfReceiver.plus(amountToWithdraw))
 
         })
-
+/*
         it("Transfer to multiple accounts", async function() {
             let accountsToReceive = [accounts[6], accounts[7], accounts[8], accounts[9]]
             let amounts = [2, 3, 4, 5]
@@ -65,15 +65,14 @@ contract('RozetToken', function(accounts) {
                amounts)
             let balance = await rozetToken.balanceOf(accounts[7])
             assert.equal(balance, 3, "balance was not distributed")
-        })
+        })*/
 
     })
 
-    describe('Voting', function() {
+    describe('Voting.', function() {
 
         before(async function() {
             await deployContract
-            // Give 10 roz to voterOne and 5 roz to voterTwo.
             await rozetToken.transfer(voterOne, web3.toWei(500, 'ether'), {
                 from: tokenHolder
             })
@@ -213,37 +212,44 @@ contract('RozetToken', function(accounts) {
             {from: voterOne}).should.be.rejectedWith('revert')
         })
 
-        it('Can set trusted sponsor.', async function() {
-          let numberOfTrustedSponsors = await rozetToken.numberOfTrustedSponsors()
-          await rozetToken.setTrustedSponsor(tokenHolder, numberOfTrustedSponsors - 1,
-            {from: voterOne})
-          let trustedSponsors = await rozetToken.getTrustedSponsors(voterOne)
-          trustedSponsors[trustedSponsors.length - 1].should.be.equal(tokenHolder)
+    })
+
+    describe('Basic Staking.', function() {
+
+        before(async function() {
+            await deployContract
+            await rozetToken.transfer(voterThree, web3.toWei(500, 'ether'), {
+                from: tokenHolder
+            })
         })
 
-        it('Can remove trusted sponsor.', async function() {
-          let numberOfTrustedSponsors = await rozetToken.numberOfTrustedSponsors()
-          await rozetToken.setTrustedSponsor('0x0000000000000000000000000000000000000000',
-          numberOfTrustedSponsors - 1, {from: voterOne})
-          let trustedSponsors = await rozetToken.getTrustedSponsors(voterOne)
-          trustedSponsors[trustedSponsors.length - 1].should.be.equal(
-            '0x0000000000000000000000000000000000000000')
+        it('Can stake.', async function() {
+          let stakeAmount = web3.toWei(1, 'ether')
+          await rozetToken.stakeTokens(voterThree, stakeAmount, 0, 0, {from: voterThree})
+          let amountStaked = await rozetToken.amountStakedFor(voterThree)
+          // Should have one Roz staked.
+          amountStaked.should.be.bignumber.equal(web3.toWei(1, 'ether'))
         })
 
-        it('Can not exceed limit for trusted sponsors.', async function() {
-          let numberOfTrustedSponsors = await rozetToken.numberOfTrustedSponsors()
-          await rozetToken.setTrustedSponsor(tokenHolder, numberOfTrustedSponsors,
-             {from: voterOne}).should.be.rejectedWith('revert')
-        })
+        it("Removing stake returns funds.", async function() {
+          let balance = await rozetToken.balanceOf(voterThree)
+          // Must wait to release the stake.
+          await increaseTime(duration.days(4))
+          let stakeIds = await rozetToken.stakesOf(voterThree)
+          let stakeId = stakeIds[0]
+          await rozetToken.releaseStakedTokens(stakeId, {from: voterThree})
+          let newBalance = await rozetToken.balanceOf(voterThree)
+          newBalance.should.be.bignumber.equal(balance.plus(web3.toWei(1, 'ether')))
 
+        })
 
     })
 
-    describe('burn', function() {
+    describe('Burn.', function() {
 
         before(deployContract)
 
-        it('burns the requested amount', async function() {
+        it('Burns the requested amount.', async function() {
             let balance = await rozetToken.balanceOf(tokenHolder)
             await rozetToken.burn(100, {
                 tokenHolder
@@ -252,7 +258,7 @@ contract('RozetToken', function(accounts) {
             assert.equal(balance - 100, newBalance)
         })
 
-        it('emits a burn event', async function() {
+        it('Emits a burn event.', async function() {
             const {
                 logs
             } = await rozetToken.burn(100, {
@@ -269,7 +275,7 @@ contract('RozetToken', function(accounts) {
             assert.equal(logs[1].args.value, 100)
         })
 
-        it('when the given amount is greater than the balance of the sender', async function() {
+        it('Can not burn more than you have.', async function() {
             let amount = await rozetToken.balanceOf(tokenHolder)
             amount = amount.toNumber() + 1
             await rozetToken.burn(amount, {
