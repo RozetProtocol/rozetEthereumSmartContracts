@@ -62,7 +62,7 @@ contract Rozet {
   mapping(address => address[numberOfTrustedSponsors]) public trustedSponsors;
 
   /*
-    A sponsor can issue a badge on a sender's behalf. This benifits the sender since they can issue badges
+    A sponsor can issue a badge on a sender's behalf. This benefits the sender since they can issue badges
     without the need for a node or connection to a node (metamask), however the tradeoff is that the sponsor must be trusted.
     updateTrustedSponsor allows a user to retroactivly mark a sponsor as trusted or not. This will aid reputation algorithms when assessing
     the verasity of a badge issued by a sponsor. Note that a sender also has the option of signing a badge offline, this avoids gas fees,
@@ -279,10 +279,10 @@ contract Rozet {
       badge.recipientData = _recipientData;
       // Have a mapping so that users can pass address of beneficiaries instead of an index. (useful if they always pay themselves since they can avoid a loop)
       receivedSponsors[badge.recipient][badge.sponsor] = true;
-      // This has the same info as the above datastructure, but is itterable off-chain.
+      // This has the same info as the above datastructure, but is iterable off-chain.
       receivedSponsorsIterable[badge.recipient].push(badge.sponsor);
 
-      // We need an array as well so that sponsors can itterate over the valid beneficiries, which cant be done with a mapping.
+      // We need an array as well so that sponsors can iterate over the valid beneficiries, which cant be done with a mapping.
       receivedBadges[msg.sender].push(badgeId);
       allBadges[badgeId] = badge;
       emit BadgeReceived(msg.sender, badgeId, _recipientData);
