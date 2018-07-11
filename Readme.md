@@ -26,6 +26,10 @@ ganache-cli -e 600000
 truffle test
 ```
 
+### The Basics of Rozet
+
+Most clients will interact with Rozet via the Javascript or Python SDKs and not call these Solidity functions directly. For more information on exact usage see those documents. 
+
  ### issueBadge
 
  In Rozet a badge represents a review or type of reputation information. Issuing a badge to someone is analogous to writing something on a piece of paper and handing it to someone else. The only difference is that the recipient can not alter anything that was written.
@@ -38,9 +42,7 @@ truffle test
 
  ### receiveBadge
 
- This function allows the user to approve of a badge that has been sent to them. They may optionally alter the badge with any data they wish to add. For example, in the event that IMDB, for example, wishes to query a review from a group of trusted users, those users would write their review via this function.
-
- This function is also responsible for distribution of payment, either to the users receiving the badge or any users responsible for making the recipient reputable in the first place.
+ This function allows the user to approve of a badge that has been sent to them. They may optionally alter the badge with any data they wish to add. For example, in the event that IMDB wishes to query a review from a group of reputable users, those users could write their review via this function.
 
 ### License
 
