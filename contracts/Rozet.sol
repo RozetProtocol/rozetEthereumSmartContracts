@@ -1,13 +1,10 @@
 
-
-
 pragma solidity ^ 0.4.24;
 
 import "./RozetToken.sol";
 
 contract Rozet {
 
-  // "0xcea271df25a47087252da2fe9b7d6d9152f0c98a"
   RozetToken public rozetToken;
 
   struct Badge {
@@ -228,8 +225,6 @@ contract Rozet {
     return id;
   }
 
-  // "0xf06162929767F6a7779af9339687023cf2351fc5", "0xf06162929767F6a7779af9339687023cf2351fc5", "0xf06162929767F6a7779af9339687023cf2351fc5", "test badge data"
-  // Create a new badge and assign it to recipient.
   function issueBadge(address _sender, address _recipient, address _beneficiary, string _data) public returns(uint id) {
 
     // Non-receivable badges (i.e. badges with no beneficiary) do not require stake to issue.

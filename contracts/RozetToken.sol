@@ -182,7 +182,7 @@ contract RozetToken {
         stakeRequirement = totalStakeRequirementVote.div(totalStakeRequirementVoteAmount);
 
         // Even if a user removes their vote they are still eligible for rewards since they voted in the past.
-        // For that reason they are not removed from the voters array.
+        // For that reason they are not removed from the voters array at this point.
       }
 
     }
