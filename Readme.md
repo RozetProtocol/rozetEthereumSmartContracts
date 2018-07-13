@@ -2,8 +2,8 @@
 
 - [Introduction](#introduction)
 - [Installation](#installation)
-- [Rozet](#Rozet)
-  - [issueBadge](#issueBadge)
+- [Rozet](#rozet)
+  - [issueBadge](#issuebadge)
   - [issueBadgeFromSignature](#issueBadgeFromSignature)
   - [receiveBadge](#receiveBadge)
   - [getBadgeById](#getBadgeById)
