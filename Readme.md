@@ -72,7 +72,7 @@ truffle test
 ```
 ***
 
-# Rozet.sol
+# Rozet
 
 This is the contract responsible for issuing and receiving badges. It is instantiated with the RozetToken ERC20 contract, which is used for all governance and payment functions.
 
@@ -511,7 +511,7 @@ A profile is a data structure that can optionally be uploaded with no Roz fee th
 ```
 ***
 
-# RozetToken.sol
+# RozetToken
 
 The RozetToken is a mintable standard token primarily derived from OpenZepplin (https://github.com/OpenZeppelin/openzeppelin-solidity/tree/master/contracts/token/ERC20). It has been extended to allow for staking and voting for use with the Rozet smart contract.
 
