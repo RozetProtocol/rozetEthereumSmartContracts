@@ -375,7 +375,7 @@ let hasEnough = rozet.receiveBadge('0x96311e071Ecc22A486144c9E178f21776F876873')
 
 This function returns the required amount of Roz stake (denominated in Roz-Wei) to issue or receive more than five badges per 24 hour period. Note that issuing and receiving are tallied separately. For example, if an address issues four badges and receives three badges then they will be able to issue one more badge and receive two more badge before reaching the sending and receiving limit for tier two is reached.
 
-To see how voting for this value works please see [stakeTokens](#staketokens)
+To see how voting for this value works please see [stakeTokens](#staketokens).
 
 ##### Parameters
 
