@@ -84,20 +84,6 @@ contract RozetToken {
 
     }
 
-    function stakesOf(address lender) public view returns(uint256[]) {
-        return stakesOfUser[lender];
-    }
-
-    function getStakeById(uint id) public constant returns (address holder, address beneficiary, uint amount,
-      uint timeStaked, bool isReleased) {
-        Stake memory stake = allStakes[id];
-        holder = stake.holder;
-        beneficiary = stake.beneficiary;
-        amount = stake.amount;
-        timeStaked = stake.timeStaked;
-        isReleased = stake.isReleased;
-    }
-
     function stakeTokens(address _beneficiary, uint amount, uint badgeVote, uint stakeVote) public {
 
       require(amount > 0);
@@ -151,6 +137,20 @@ contract RozetToken {
         stakeRequirement = totalStakeRequirementVote.div(totalStakeRequirementVoteAmount);
       }
 
+    }
+
+    function stakesOf(address lender) public view returns(uint256[]) {
+        return stakesOfUser[lender];
+    }
+
+    function getStakeById(uint id) public constant returns (address holder, address beneficiary, uint amount,
+      uint timeStaked, bool isReleased) {
+        Stake memory stake = allStakes[id];
+        holder = stake.holder;
+        beneficiary = stake.beneficiary;
+        amount = stake.amount;
+        timeStaked = stake.timeStaked;
+        isReleased = stake.isReleased;
     }
 
     function releaseStakedTokens(uint id) public {

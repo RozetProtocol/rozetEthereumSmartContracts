@@ -61,6 +61,127 @@ contract Rozet {
   uint constant public numberOfTrustedSponsors = 1000;
   mapping(address => address[numberOfTrustedSponsors]) public trustedSponsors;
 
+  function issueBadge(address _sender, address _recipient, address _beneficiary, string _data) public returns(uint id) {
+
+    // Non-receivable badges (i.e. badges with no beneficiary) do not require stake to issue.
+    if (_beneficiary != 0x0000000000000000000000000000000000000000) {
+      require(hasEnoughStakeToIssue(msg.sender), "User does not have enough stake to issue.");
+    }
+
+    Badge memory badge;
+    badge.senderData = _data;
+    badge.sponsor = msg.sender;
+    badge.sender = _sender;
+    badge.recipient = _recipient;
+    badge.beneficiary = _beneficiary;
+    badge.timeIssued = now;
+
+    if (msg.sender == _sender) {
+      badge.senderSigned = true;
+    }
+
+    id = allBadges.push(badge) - 1;
+    usersBadges[_recipient].push(id);
+    issuedBadges[msg.sender].push(id);
+    emit BadgeIssued(badge.sponsor, _recipient, id, _data);
+
+    return id;
+  }
+
+  // This function allows anyone to send badges to anyone else without paying for gas.
+  function issueBadgeFromSignature(uint8 v, bytes32 r, bytes32 s, address sender, address recipient, address beneficiary,  string data) public returns (uint) {
+
+    // Make sure that the sender did, in fact, sign the command to issue a badge.
+    bytes32 messageA = keccak256(abi.encodePacked("address Sender", "address Recipient", "address Address to Pay", "string Data"));
+    bytes32 messageB = keccak256(abi.encodePacked(sender, recipient, beneficiary,  data));
+    bytes32 message = keccak256(abi.encodePacked(messageA, messageB));
+    require(ecrecover(message, v, r, s) == sender);
+
+    Badge memory badge;
+    badge.senderData = data;
+    badge.sponsor = msg.sender;
+    badge.sender = sender;
+    badge.recipient = recipient;
+
+    /*
+      Paying Roz as a fee. In this case the sponsor must pay a small Roz fee to the beneficiary. The beneficiary must be a sponsor
+      of one of the recipients previous badges. This option also affords the sponsor the opportunity to earn more Roz in the future
+      since they now become a sponsor of one of the recipient's previous badges, and can earn Roz each time the recipient receives a new badge.
+    */
+    badge.beneficiary = beneficiary;
+
+    /*
+       True means that the sender has cryptographicly approved the data in badge.senderData.
+       False means that the sponsor has writen to badge.senderData on behalf of the sender, and the sender has yet to approve.
+       In the case that the sender has signed the message themselves, then senderSigned is always true.
+    */
+    badge.senderSigned = true;
+
+    uint id = allBadges.push(badge) - 1;
+
+    usersBadges[recipient].push(id);
+
+    emit BadgeIssued(badge.sponsor, recipient, id, data);
+
+    return id;
+  }
+
+
+  function receiveBadge(uint badgeId, string _recipientData) public {
+
+    Badge memory badge = allBadges[badgeId];
+
+    // Ensure that the badge exists and that only its true recipient is recieving it, and that it has not already been received.
+    require(badge.recipient == msg.sender && badge.recipientSigned == false);
+
+    // Receiving a badge free for the first badge, but requires payment thereafter.
+    bool doesRequirePayment = receivedBadges[msg.sender].length > 0;
+
+    bool paymentWasMade = false;
+
+    if (doesRequirePayment) {
+      require(hasEnoughStakeToReceive(msg.sender), "User does not have enough stake to receive.");
+      // To receive payment the beneficiary must have sponsored one of the recipients previously received badges.
+      require(receivedSponsors[badge.recipient][badge.beneficiary] == true);
+      uint price = uint(rozetToken.badgePrice());
+      paymentWasMade = rozetToken.transferFrom(badge.sponsor, badge.beneficiary, price);
+    }
+
+    if ((doesRequirePayment && paymentWasMade) || doesRequirePayment == false) {
+      badge.recipientSigned = true;
+      badge.recipientData = _recipientData;
+      // Have a mapping so that users can pass address of beneficiaries instead of an index. (useful if they always pay themselves since they can avoid a loop)
+      receivedSponsors[badge.recipient][badge.sponsor] = true;
+      // This has the same info as the above datastructure, but is iterable off-chain.
+      receivedSponsorsIterable[badge.recipient].push(badge.sponsor);
+
+      // We need an array as well so that sponsors can iterate over the valid beneficiries, which cant be done with a mapping.
+      receivedBadges[msg.sender].push(badgeId);
+      allBadges[badgeId] = badge;
+      emit BadgeReceived(msg.sender, badgeId, _recipientData);
+    }
+  }
+
+  function getBadgeById(uint id) public constant returns (string senderData, string recipientData, address sponsor, address sender,
+    address recipient, bool recipientSigned, bool senderSigned, address beneficiary, uint timeIssued) {
+    Badge memory badge = allBadges[id];
+
+    senderData = badge.senderData;
+    recipientData = badge.recipientData;
+    sponsor = badge.sponsor;
+    sender = badge.sender;
+    recipient = badge.recipient;
+    recipientSigned = badge.recipientSigned;
+    senderSigned = badge.senderSigned;
+    beneficiary = badge.beneficiary;
+    timeIssued = badge.timeIssued;
+
+  }
+
+  function badgesOf(address user) public view returns(uint[]) {
+    return usersBadges[user];
+  }
+
   /*
     A sponsor can issue a badge on a sender's behalf. This benefits the sender since they can issue badges
     without the need for a node or connection to a node (metamask), however the tradeoff is that the sponsor must be trusted.
@@ -85,7 +206,7 @@ contract Rozet {
     return nameToAddress[_name];
   }
 
-  function getDNSFee() public view returns (uint) {
+  function DNSFee() public view returns (uint) {
     return uint(rozetToken.badgePrice()) * 100;
   }
 
@@ -93,7 +214,7 @@ contract Rozet {
     // Require that the name has not already been taken. Note this require makes names unchangeable.
     require(nameToAddress[DNSName] == 0x0000000000000000000000000000000000000000);
     // The DNS requires a roz fee to prevent squaters from stealing all the names.
-    uint rozFee = getDNSFee();
+    uint rozFee = DNSFee();
     // Give the rozFee to a semi-random voter as a reward for voting.
     address[] memory voters = rozetToken.getVoters();
     uint index = uint(blockhash(block.number - 1)) % (voters.length);
@@ -186,126 +307,8 @@ contract Rozet {
     data2 = profile.data2;
   }
 
-  // 28, "0x0f9e203a402e5a21a61d1645b1732fd398a0d95c2a40cd122146a5c29f73c8cc", "0x3c1ef446e010531d7de22e71cd8190e6fd09ff56d1578b5f3e99c6b7f9810a5f", "0xf06162929767f6a7779af9339687023cf2351fc5", "0xf06162929767f6a7779af9339687023cf2351fc5", "0xb576B32e578cd3bEFDc677FcbaF12Ee76143e581", "Avengers is 5 stars."
-  // This function allows anyone to send badges to anyone else without paying for gas.
-  function issueBadgeFromSignature(uint8 v, bytes32 r, bytes32 s, address sender, address recipient, address beneficiary,  string data) public returns (uint) {
 
-    // Make sure that the sender did, in fact, sign the command to issue a badge.
-    bytes32 messageA = keccak256(abi.encodePacked("address Sender", "address Recipient", "address Address to Pay", "string Data"));
-    bytes32 messageB = keccak256(abi.encodePacked(sender, recipient, beneficiary,  data));
-    bytes32 message = keccak256(abi.encodePacked(messageA, messageB));
-    require(ecrecover(message, v, r, s) == sender);
 
-    Badge memory badge;
-    badge.senderData = data;
-    badge.sponsor = msg.sender;
-    badge.sender = sender;
-    badge.recipient = recipient;
-
-    /*
-      Paying Roz as a fee. In this case the sponsor must pay a small Roz fee to the beneficiary. The beneficiary must be a sponsor
-      of one of the recipients previous badges. This option also affords the sponsor the opportunity to earn more Roz in the future
-      since they now become a sponsor of one of the recipient's previous badges, and can earn Roz each time the recipient receives a new badge.
-    */
-    badge.beneficiary = beneficiary;
-
-    /*
-       True means that the sender has cryptographicly approved the data in badge.senderData.
-       False means that the sponsor has writen to badge.senderData on behalf of the sender, and the sender has yet to approve.
-       In the case that the sender has signed the message themselves, then senderSigned is always true.
-    */
-    badge.senderSigned = true;
-
-    uint id = allBadges.push(badge) - 1;
-
-    usersBadges[recipient].push(id);
-
-    emit BadgeIssued(badge.sponsor, recipient, id, data);
-
-    return id;
-  }
-
-  function issueBadge(address _sender, address _recipient, address _beneficiary, string _data) public returns(uint id) {
-
-    // Non-receivable badges (i.e. badges with no beneficiary) do not require stake to issue.
-    if (_beneficiary != 0x0000000000000000000000000000000000000000) {
-      require(hasEnoughStakeToIssue(msg.sender), "User does not have enough stake to issue.");
-    }
-
-    Badge memory badge;
-    badge.senderData = _data;
-    badge.sponsor = msg.sender;
-    badge.sender = _sender;
-    badge.recipient = _recipient;
-    badge.beneficiary = _beneficiary;
-    badge.timeIssued = now;
-
-    if (msg.sender == _sender) {
-      badge.senderSigned = true;
-    }
-
-    id = allBadges.push(badge) - 1;
-    usersBadges[_recipient].push(id);
-    issuedBadges[msg.sender].push(id);
-    emit BadgeIssued(badge.sponsor, _recipient, id, _data);
-
-    return id;
-  }
-
-  function receiveBadge(uint badgeId, string _recipientData) public {
-
-    Badge memory badge = allBadges[badgeId];
-
-    // Ensure that the badge exists and that only its true recipient is recieving it, and that it has not already been received.
-    require(badge.recipient == msg.sender && badge.recipientSigned == false);
-
-    // Receiving a badge free for the first badge, but requires payment thereafter.
-    bool doesRequirePayment = receivedBadges[msg.sender].length > 0;
-
-    bool paymentWasMade = false;
-
-    if (doesRequirePayment) {
-      require(hasEnoughStakeToReceive(msg.sender), "User does not have enough stake to receive.");
-      // To receive payment the beneficiary must have sponsored one of the recipients previously received badges.
-      require(receivedSponsors[badge.recipient][badge.beneficiary] == true);
-      uint price = uint(rozetToken.badgePrice());
-      paymentWasMade = rozetToken.transferFrom(badge.sponsor, badge.beneficiary, price);
-    }
-
-    if ((doesRequirePayment && paymentWasMade) || doesRequirePayment == false) {
-      badge.recipientSigned = true;
-      badge.recipientData = _recipientData;
-      // Have a mapping so that users can pass address of beneficiaries instead of an index. (useful if they always pay themselves since they can avoid a loop)
-      receivedSponsors[badge.recipient][badge.sponsor] = true;
-      // This has the same info as the above datastructure, but is iterable off-chain.
-      receivedSponsorsIterable[badge.recipient].push(badge.sponsor);
-
-      // We need an array as well so that sponsors can iterate over the valid beneficiries, which cant be done with a mapping.
-      receivedBadges[msg.sender].push(badgeId);
-      allBadges[badgeId] = badge;
-      emit BadgeReceived(msg.sender, badgeId, _recipientData);
-    }
-  }
-
-  function getBadgeById(uint id) public constant returns (string senderData, string recipientData, address sponsor, address sender,
-    address recipient, bool recipientSigned, bool senderSigned, address beneficiary, uint timeIssued) {
-    Badge memory badge = allBadges[id];
-
-    senderData = badge.senderData;
-    recipientData = badge.recipientData;
-    sponsor = badge.sponsor;
-    sender = badge.sender;
-    recipient = badge.recipient;
-    recipientSigned = badge.recipientSigned;
-    senderSigned = badge.senderSigned;
-    beneficiary = badge.beneficiary;
-    timeIssued = badge.timeIssued;
-
-  }
-
-  function badgesOf(address user) public view returns(uint[]) {
-    return usersBadges[user];
-  }
 
 
 }
