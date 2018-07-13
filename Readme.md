@@ -2,7 +2,7 @@
 
 - [Introduction](#introduction)
 - [Installation](#installation)
-- [Rozet.sol](#Rozet.sol)
+- [Rozet](#Rozet)
   - [issueBadge](#issueBadge)
   - [issueBadgeFromSignature](#issueBadgeFromSignature)
   - [receiveBadge](#receiveBadge)
@@ -22,7 +22,7 @@
   - [getValidBeneficiaries](#getValidBeneficiaries)
   - [setProfile](#setProfile)
   - [getProfile](#getProfile)
- - [RozetToken.sol](#RozetToken.sol)
+ - [RozetToken](#RozetToken)
    - [voteForSuperUser](#voteForSuperUser)
    - [getVotesForSuperUsers](#getVotesForSuperUsers)
    - [stakeTokens](#stakeTokens)
@@ -176,7 +176,7 @@ Returns badge properties give the ID of a badge.
 
 ##### Parameters
 
-1. `uint` - The ID of the badge whose data is to be retrieved.
+`uint` - The ID of the badge whose data is to be retrieved.
 
 ##### Returns
 
@@ -203,11 +203,11 @@ Returns an array of badge IDs that have been issued to a given address.
 
 ##### Parameters
 
-1. `address` - The address of the user whose badge's are to be queried.
+ `address` - The address of the user whose badge's are to be queried.
 
 ##### Returns
 
-1. `uint[]` - The array of badge IDs that the user is the recipient of regardless of whether or not the user has called [receiveBadge](#receiveBadge) on that badge or not.
+ `uint[]` - The array of badge IDs that the user is the recipient of regardless of whether or not the user has called [receiveBadge](#receiveBadge) on that badge or not.
 
 ##### Example
 
@@ -225,7 +225,7 @@ In the event that a user opts not to sign a transaction a sponsor may issue a ba
 ##### Parameters
 
 1. `address` - The address of the sponsor that the user has decided is trustworthy.
-2. 1. `uint` - The index in the array of 100 total sponsors that a user can elect.
+2. `uint` - The index in the array of 100 total sponsors that a user can elect.
 
 ##### Returns
 
@@ -243,12 +243,12 @@ This method can be called by RozetRank algorithms to assess the quality of a bad
 
 ##### Parameters
 
-1. `address` - The address of the sender in question.
+ `address` - The address of the sender in question.
 
 
 ##### Returns
 
-1. `address[]` - The sender has approved any sponsors, they will be returned in this array.
+ `address[]` - The sender has approved any sponsors, they will be returned in this array.
 
 
 ##### Example
@@ -264,12 +264,12 @@ This method is part of the Rozet Domain Name System.
 
 ##### Parameters
 
-1. `address` - The address to query. If this address has registered a name with the Rozet DNS, then it will be returned.
+ `address` - The address to query. If this address has registered a name with the Rozet DNS, then it will be returned.
 
 
 ##### Returns
 
-1. `bytes32` - The name, if any,  that the given address has registered with the DNS.
+ `bytes32` - The name, if any,  that the given address has registered with the DNS.
 
 ##### Example
 
@@ -291,7 +291,7 @@ None.
 
 ##### Returns
 
-1. `uint` - The fee, in Roz-Wei, required to call [setName](#setName)
+ `uint` - The fee, in Roz-Wei, required to call [setName](#setName)
 
 ##### Example
 
@@ -306,7 +306,7 @@ This method reserves a name for the caller in the Rozet DNS. Each address can ha
 
 ##### Parameters
 
-1. `string` - The name the calling address wishes to reserve.
+ `string` - The name the calling address wishes to reserve.
 
 
 ##### Returns
@@ -333,11 +333,11 @@ To issue more than five badges per day: [tierTwoRequirement](#tierTwoRequirement
 
 ##### Parameters
 
-1. `address` - The address to query.
+ `address` - The address to query.
 
 ##### Returns
 
-1. `bool` - Will return true if this address has enough stake to call [issueBadge](#issueBadge) or false otherwise. Note that the caller (```msg.sender```) of the [issueBadge](#issueBadge) function, and not the actual sender of the badge is required to have stake. For example, an address can call [issueBadgeFromSignature](#issueBadgeFromSignature) with a different address as the ```sender``` parameter, and the caller will be required to have an appropriate level of stake.
+ `bool` - Will return true if this address has enough stake to call [issueBadge](#issueBadge) or false otherwise. Note that the caller (```msg.sender```) of the [issueBadge](#issueBadge) function, and not the actual sender of the badge is required to have stake. For example, an address can call [issueBadgeFromSignature](#issueBadgeFromSignature) with a different address as the ```sender``` parameter, and the caller will be required to have an appropriate level of stake.
 
 ##### Example
 
@@ -358,11 +358,11 @@ To receive more than five badges per day: [tierTwoRequirement](#tierTwoRequireme
 
 ##### Parameters
 
-1. `address` - The address to query.
+`address` - The address to query.
 
 ##### Returns
 
-1. `bool` - Will return true if this address has enough stake to call [receiveBadge](#receiveBadge) or false otherwise.
+ `bool` - Will return true if this address has enough stake to call [receiveBadge](#receiveBadge) or false otherwise.
 
 ##### Example
 
@@ -383,7 +383,7 @@ None.
 
 ##### Returns
 
-1. `uint` - The required amount of stake necessary to call
+`uint` - The required amount of stake necessary to call
  [issueBadge](#issueBadge) or  [issueBadgeFromSignature](#issueBadgeFromSignature) more than five times in a 24 hour period. This value is also the required amount of stake needed to call [receiveBadge](#receiveBadge) more than five times in a 24 hour period.
 
 ##### Example
@@ -406,7 +406,7 @@ None.
 
 ##### Returns
 
-1. `uint` - The required amount of stake necessary to call
+ `uint` - The required amount of stake necessary to call
  [issueBadge](#issueBadge) or  [issueBadgeFromSignature](#issueBadgeFromSignature) more than 100 times in a 24 hour period. This value is also the required amount of stake needed to call [receiveBadge](#receiveBadge) more than 100 times in a 24 hour period.
 
 ##### Example
@@ -428,7 +428,7 @@ None.
 
 ##### Returns
 
-1. `uint` - The required amount of stake necessary to call
+ `uint` - The required amount of stake necessary to call
  [issueBadge](#issueBadge) or  [issueBadgeFromSignature](#issueBadgeFromSignature) more than 1000 times in a 24 hour period. This value is also the required amount of stake needed to call [receiveBadge](#receiveBadge) more than 1000 times in a 24 hour period.
 
 ##### Example
@@ -449,11 +449,11 @@ If there are no valid beneficiaries for a given recipient, then it is free to se
 
 ##### Parameters
 
-1. `address` - The intended recipient of the receivable badge. Valid beneficiaries must be a ```badge.sponsor``` of the recipient's previous badges that has already been received via [receiveBadge](#receiveBadge).
+ `address` - The intended recipient of the receivable badge. Valid beneficiaries must be a ```badge.sponsor``` of the recipient's previous badges that has already been received via [receiveBadge](#receiveBadge).
 
 ##### Returns
 
-1. `address[]` - An array of valid beneficiaries. Passing any valid beneficiary to [issueBadge](#issueBadge) will result in a receivable badge being issued. It is up to the badge issuer to choose a beneficiary to reward.
+ `address[]` - An array of valid beneficiaries. Passing any valid beneficiary to [issueBadge](#issueBadge) will result in a receivable badge being issued. It is up to the badge issuer to choose a beneficiary to reward.
 
 ##### Example
 
@@ -493,7 +493,7 @@ A profile is a data structure that can optionally be uploaded with no Roz fee th
 
 ##### Parameters
 
-1. `address` - The address who's associated profile data you wish to query.
+ `address` - The address who's associated profile data you wish to query.
 
 ##### Returns
 
@@ -541,11 +541,11 @@ Roz token holders can vote for superusers. A superuser is an additional tag that
 
 ##### Parameters
 
-1. `address` - The address whose votes are to be queried.
+ `address` - The address whose votes are to be queried.
 
 ##### Returns
 
-1. `address[]` - The addresses of the superusers that the given address has voted for.
+`address[]` - The addresses of the superusers that the given address has voted for.
 
 ##### Example
 
@@ -584,12 +584,12 @@ Returns the IDs of any stake objects that a given address has issued.
 
 ##### Parameters
 
-1. `address` - The address of the stake issuer.
+ `address` - The address of the stake issuer.
 
 
 ##### Returns
 
-1. `uint[]` - An array of stake IDs. The ID can be used to query the properties of the stake by calling [getStakeById](#getStakeById).
+`uint[]` - An array of stake IDs. The ID can be used to query the properties of the stake by calling [getStakeById](#getStakeById).
 
 ##### Example
 
@@ -603,7 +603,7 @@ Returns the properties of a stake given the stake ID.
 
 ##### Parameters
 
- 1. `uint` - The ID of the stake returned by [stakesOf](#stakesOf).
+  `uint` - The ID of the stake returned by [stakesOf](#stakesOf).
 
 ##### Returns
 
@@ -627,7 +627,7 @@ While Roz is staked the Roz is held in escrow by the RozetToken smart contract. 
 
 ##### Parameters
 
- 1. `uint` - The ID of the stake returned by [stakesOf](#stakesOf).
+  `uint` - The ID of the stake returned by [stakesOf](#stakesOf).
 
 ##### Returns
 
@@ -652,7 +652,7 @@ Voters are addresses that have voted for either [badgePrice](#badgePrice) or
 
 ##### Returns
 
- 1. `address[]` - An array of all voters. This array is used to determine what address is eligible to randomly receive Roz payment as a reward when [setName](#setName) is called.
+ `address[]` - An array of all voters. This array is used to determine what address is eligible to randomly receive Roz payment as a reward when [setName](#setName) is called.
 
 ##### Example
 
@@ -671,7 +671,7 @@ The standard ERC20 function that returns the total supply of all Roz.
 
 ##### Returns
 
- 1. `uint` - The total supply.
+  `uint` - The total supply.
 
 ##### Example
 
@@ -747,7 +747,7 @@ The standard ERC20 function to permanently destroy tokens.
 
 ##### Parameters
 
-1. `uint` - The amount to burn denominated in Roz-Wei.
+ `uint` - The amount to burn denominated in Roz-Wei.
 
 ##### Returns
 
@@ -758,11 +758,7 @@ Note that 'ether' denotes the denomination and not the currency. In this example
 
 ```js
 rozetToken.burn(web3.toWei(1, 'ether'))
-
-
-
-
-
+```
 
 
 
