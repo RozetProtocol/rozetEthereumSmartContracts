@@ -89,12 +89,12 @@ Examples of a badge are, a movie review, diploma, trophy, or award.
 
 1. `address` - The address of the sender. The address that supplied the data for  ```badge.senderData```. In the example of a review, the sender is the person who writes the review.
 2. `address` - The address of the recipient. In the example of a review, the recipient is the address of the product or entity being reviewed (if one exists).
-3. `address` - The address of the beneficiary. In the event that this address is the zero address, then the badge issued will not be receivable. Receivable badges are generally more reputable than non-receivable, however they require a fee to be paied to the beneficiary.  If the caller wishes this badge to be [receivable](#receiveBadge) then this is the address that will be paid the badge price fee after the badge is received by the recipient. For this address to be valid it must be present in the recipient's ```receivedSponsorsIterable``` array which can be queried via [getValidBeneficiaries](#getValidBeneficiaries) by passing the recipients address as the parameter.
-4. `string` - This is the data provided by the badge sender. It is stored in ```badge.senderData```. In the example of a review, this would be the review content provided by the sender. A recipient could also contributed to a review, but it would be stored in  ```badge.recipientData``` and can only be uploaded by the recipient by calling [receiveBadge](#receiveBadge) and passing the badge ID of this badge.
+3. `address` - The address of the beneficiary. In the event that this address is the zero address, then the badge issued will not be receivable. Receivable badges are generally more reputable than non-receivable, however they require a fee to be paied to the beneficiary.  If the caller wishes this badge to be [receivable](#receivebadge) then this is the address that will be paid the badge price fee after the badge is received by the recipient. For this address to be valid it must be present in the recipient's ```receivedSponsorsIterable``` array which can be queried via [getValidBeneficiaries](#getValidbeneficiaries) by passing the recipients address as the parameter.
+4. `string` - This is the data provided by the badge sender. It is stored in ```badge.senderData```. In the example of a review, this would be the review content provided by the sender. A recipient could also contributed to a review, but it would be stored in  ```badge.recipientData``` and can only be uploaded by the recipient by calling [receiveBadge](#receivebadge) and passing the badge ID of this badge.
 
 ##### Returns
 
-`uint` - The unique badge ID of this badge. This can be used to query badge data by passing it to [getBadgeById](#getBadgeById). It can also be used by the recipient to receive the badge by passing it to [receiveBadge](#receiveBadge).
+`uint` - The unique badge ID of this badge. This can be used to query badge data by passing it to [getBadgeById](#getbadgebyid). It can also be used by the recipient to receive the badge by passing it to [receiveBadge](#receivebadge).
 
 ##### Example
 
@@ -104,7 +104,7 @@ rozet.issueBadge('0xf06162929767F6a7779af9339687023cf2351fc5', '0x96311e071Ecc22
 ***
 ## issueBadgeFromSignature
 
-Issuing a badge from signature is provides the same functionality as [issueBadge](#issueBadge) except that it can be called by a third party on behalf of a sender to save the sender gas.
+Issuing a badge from signature is provides the same functionality as [issueBadge](#issuebadge) except that it can be called by a third party on behalf of a sender to save the sender gas.
 
 ##### Parameters
 The first three parameters v, r, and s are all parts of the elliptic curve signature that the Rozet smart contract uses to prove that only the true owner of the sender's address signed the transaction. See the Javascript example below.
@@ -113,12 +113,12 @@ The first three parameters v, r, and s are all parts of the elliptic curve signa
 3. `uint8` - s.   
 4. `address` - The address of the sender. The address that supplied the data for  ```badge.senderData```. In the example of a review, the sender is the person who writes the review.
 5. `address` - The address of the recipient. In the example of a review, the recipient is the address of the product or entity being reviewed (if one exists).
-6. `address` - The address of the beneficiary. In the event that this address is the zero address, then the badge issued will not be receivable. Receivable badges are generally more reputable than non-receivable, however they require a fee to be paid to the beneficiary.  If the caller wishes this badge to be [receivable](#receiveBadge) then this is the address that will be paid the badge price fee after the badge is received by the recipient. For this address to be valid it must be present in the recipient's ```receivedSponsorsIterable``` array which can be queried via [getValidBeneficiaries](#getValidBeneficiaries) by passing the recipients address as the parameter.
-7. `string` - This is the data provided by the badge sender. It is stored in ```badge.senderData```. In the example of a review, this would be the review content provided by the sender. A recipient could also contributed to a review, but it would be stored in  ```badge.recipientData``` and can only be uploaded by the recipient by calling [receiveBadge](#receiveBadge) and passing the badge ID of this badge.
+6. `address` - The address of the beneficiary. In the event that this address is the zero address, then the badge issued will not be receivable. Receivable badges are generally more reputable than non-receivable, however they require a fee to be paid to the beneficiary.  If the caller wishes this badge to be [receivable](#receivebadge) then this is the address that will be paid the badge price fee after the badge is received by the recipient. For this address to be valid it must be present in the recipient's ```receivedSponsorsIterable``` array which can be queried via [getValidBeneficiaries](#getValidbeneficiaries) by passing the recipients address as the parameter.
+7. `string` - This is the data provided by the badge sender. It is stored in ```badge.senderData```. In the example of a review, this would be the review content provided by the sender. A recipient could also contributed to a review, but it would be stored in  ```badge.recipientData``` and can only be uploaded by the recipient by calling [receiveBadge](#receivebadge) and passing the badge ID of this badge.
 
 ##### Returns
 
-`uint` - The unique badge ID of this badge. This can be used to query badge data by passing it to [getBadgeById](#getBadgeById). It can also be used by the recipient to receive the badge by passing it to [receiveBadge](#receiveBadge).
+`uint` - The unique badge ID of this badge. This can be used to query badge data by passing it to [getBadgeById](#getbadgebyid). It can also be used by the recipient to receive the badge by passing it to [receiveBadge](#receivebadge).
 
 ##### Example
 Note ```ethers.Wallet.createRandom``` is from https://github.com/ethers-io/ethers.js/ and
@@ -182,13 +182,13 @@ Returns badge properties give the ID of a badge.
 
 1. `string` - The sender data. For example a review.
 2. `string` - The recipient data. For example a review or response to a review.
-'address' - The sponsor. A sponsor is someone who sends a badge on behalf of a user without that users signature. A user may later approve a sponsor and thus signal that they approve of the message sent on their behalf. If a user does not wish to take the risk of a sponsor sending data on their behalf they are free to use [issueBadgeFromSignature](#issueBadgeFromSignature). Neither method requires the user paying gas. Additionally a user may sponsor their own badges, which requires them to pay the gas fee and badge fee, but also makes them eligible for future Roz rewards since they can now be valid beneficiaries to future badge issuers that are required to pay the network.
+'address' - The sponsor. A sponsor is someone who sends a badge on behalf of a user without that users signature. A user may later approve a sponsor and thus signal that they approve of the message sent on their behalf. If a user does not wish to take the risk of a sponsor sending data on their behalf they are free to use [issueBadgeFromSignature](#issuebadgefromsignature). Neither method requires the user paying gas. Additionally a user may sponsor their own badges, which requires them to pay the gas fee and badge fee, but also makes them eligible for future Roz rewards since they can now be valid beneficiaries to future badge issuers that are required to pay the network.
 3. `string` - The address of the user who may have written badge.senderData.
-4. `address` - The recipient address. Only this address is allowed to upload recipientData via [receiveBadge](#receiveBadge).
+4. `address` - The recipient address. Only this address is allowed to upload recipientData via [receiveBadge](#receivebadge).
 5. `bool` - Recipient Signed. This indicates that the recipient has received this badge.
-6. `bool` - Sender Signed. This indicates that the sender has either issued the bage on their own behalf, or signed the transaction to issue the badge. In the case that this is false, a sponsor has issued a badge on behalf of the sender without approval from the sender. A sender can, at any time, upload their opinion of any sponsor to the blockchain via [setTrustedSponsor](#setTrustedSponsor). Or if they wish to operate without the need to trust a sponsor a badge issuer may issue a badge, with no gas fee, via [issueBadgeFromSignature](#issueBadgeFromSignature). A third option would be for the user to call [issueBadge](#issueBadge) directly and pay for the gas. In this third case the ```senderSigned``` is set to true.
-7. `address` - The beneficiary address. This is the address that the issuer has chosen to pay the badge issuing fee to in the event that a user recieves this badge with [receiveBadge](#receiveBadge). If the ```RozetToken``` contract has not been approved to take the fee, or this address is invalid as determined by [receiveBadge](#receiveBadge) then the badge will not be receivable, and thus may be less reputable.
-8. `address` - The time issued. This time stamp is used by the Rozet contract to determine if a user has reached their limit of issuing five or more badges per day. Issuing more than five badges per day requires a stake of Roz tokens. See [hasEnoughStakeToIssue](#hasEnoughStakeToIssue).
+6. `bool` - Sender Signed. This indicates that the sender has either issued the bage on their own behalf, or signed the transaction to issue the badge. In the case that this is false, a sponsor has issued a badge on behalf of the sender without approval from the sender. A sender can, at any time, upload their opinion of any sponsor to the blockchain via [setTrustedSponsor](#settrustedsponsor). Or if they wish to operate without the need to trust a sponsor a badge issuer may issue a badge, with no gas fee, via [issueBadgeFromSignature](#issuebadgefromsignature). A third option would be for the user to call [issueBadge](#issuebadge) directly and pay for the gas. In this third case the ```senderSigned``` is set to true.
+7. `address` - The beneficiary address. This is the address that the issuer has chosen to pay the badge issuing fee to in the event that a user recieves this badge with [receiveBadge](#receivebadge). If the ```RozetToken``` contract has not been approved to take the fee, or this address is invalid as determined by [receiveBadge](#receivebadge) then the badge will not be receivable, and thus may be less reputable.
+8. `address` - The time issued. This time stamp is used by the Rozet contract to determine if a user has reached their limit of issuing five or more badges per day. Issuing more than five badges per day requires a stake of Roz tokens. See [hasEnoughStakeToIssue](#hasenoughstaketoissue).
 ##### Example
 
 ```js
@@ -207,7 +207,7 @@ Returns an array of badge IDs that have been issued to a given address.
 
 ##### Returns
 
- `uint[]` - The array of badge IDs that the user is the recipient of regardless of whether or not the user has called [receiveBadge](#receiveBadge) on that badge or not.
+ `uint[]` - The array of badge IDs that the user is the recipient of regardless of whether or not the user has called [receiveBadge](#receivebadge) on that badge or not.
 
 ##### Example
 
@@ -220,7 +220,7 @@ let badges = rozet.badgesof('0x96311e071Ecc22A486144c9E178f21776F876873');
 
 ## setTrustedSponsor
 
-In the event that a user opts not to sign a transaction a sponsor may issue a badge on that users behalf. In the event that the user feels that the sponsor has represented that user accurately, the user may boradcast this to the network via the setTrustedSponsor method. Each user may elect up to 100 trusted sponsors. This data is usefull to RozetRank algorithms for determining the validity of a sponsored badge.
+In the event that a user opts not to sign a transaction a sponsor may issue a badge on that users behalf. In the event that the user feels that the sponsor has represented that user accurately, the user may broadcast this to the network via the setTrustedSponsor method. Each user may elect up to 100 trusted sponsors. This data is useful to RozetRank algorithms for determining the validity of a sponsored badge.
 
 ##### Parameters
 
@@ -291,7 +291,7 @@ None.
 
 ##### Returns
 
- `uint` - The fee, in Roz-Wei, required to call [setName](#setName)
+ `uint` - The fee, in Roz-Wei, required to call [setName](#setname)
 
 ##### Example
 
@@ -302,7 +302,7 @@ let fee = rozet.DNSFee();
 
 ## setName
 
-This method reserves a name for the caller in the Rozet DNS. Each address can have only one name associated with it, and each unique name can only be associated with one address. This method requires a fee. The fee is voted on by stakers. The latest fee can be determined by calling [DNSFee](#DNSFee). The fee is paid by approving the Rozet contract address to take the fee, and then calling [setName](#setName).
+This method reserves a name for the caller in the Rozet DNS. Each address can have only one name associated with it, and each unique name can only be associated with one address. This method requires a fee. The fee is voted on by stakers. The latest fee can be determined by calling [DNSFee](#dnsfee). The fee is paid by approving the Rozet contract address to take the fee, and then calling [setName](#setname).
 
 ##### Parameters
 
@@ -327,9 +327,9 @@ await rozet.setName("Name to set", {from: voterOne})
 Each user can issue no more than five badges per day without any stake. To issue a higher volume of badges, a user must stake Roz equal to the staking requirements. This function determines if a user has enough stake to issue a badge based on their usage history thus far.
 
 The specific stake requirements vary depending on how the Roz holders vote. The current stake requirements are queried with:
-To issue more than five badges per day: [tierTwoRequirement](#tierTwoRequirement)
- To issue more than 100 badges per day: [tierThreeRequirement](#tierThreeRequirement)
- To issue more than 1000 badges per day: [tierFourRequirement](#tierFourRequirement)
+To issue more than five badges per day: [tierTwoRequirement](#tiertworequirement)
+ To issue more than 100 badges per day: [tierThreeRequirement](#tierthreerequirement)
+ To issue more than 1000 badges per day: [tierFourRequirement](#tierfourrequirement)
 
 ##### Parameters
 
@@ -337,7 +337,7 @@ To issue more than five badges per day: [tierTwoRequirement](#tierTwoRequirement
 
 ##### Returns
 
- `bool` - Will return true if this address has enough stake to call [issueBadge](#issueBadge) or false otherwise. Note that the caller (```msg.sender```) of the [issueBadge](#issueBadge) function, and not the actual sender of the badge is required to have stake. For example, an address can call [issueBadgeFromSignature](#issueBadgeFromSignature) with a different address as the ```sender``` parameter, and the caller will be required to have an appropriate level of stake.
+ `bool` - Will return true if this address has enough stake to call [issueBadge](#issuebadge) or false otherwise. Note that the caller (```msg.sender```) of the [issueBadge](#issuebadge) function, and not the actual sender of the badge is required to have stake. For example, an address can call [issueBadgeFromSignature](#issuebadgefromsignature) with a different address as the ```sender``` parameter, and the caller will be required to have an appropriate level of stake.
 
 ##### Example
 
@@ -352,9 +352,9 @@ let hasEnough = rozet.hasEnoughStakeToIssue('0x96311e071Ecc22A486144c9E178f21776
 Each user can receive no more than five badges per day without any stake. To receive a higher volume of badges, a user must stake Roz equal to the staking requirements. This function determines if a user has enough stake to issue a badge based on their usage history thus far.
 
 The specific stake requirements vary depending on how the Roz holders vote. The current stake requirements are queried with:
-To receive more than five badges per day: [tierTwoRequirement](#tierTwoRequirement)
- To receive more than 100 badges per day: [tierThreeRequirement](#tierThreeRequirement)
- To receive more than 1000 badges per day: [tierFourRequirement](#tierFourRequirement)
+To receive more than five badges per day: [tierTwoRequirement](#tiertworequirement)
+ To receive more than 100 badges per day: [tierThreeRequirement](#tierthreerequirement)
+ To receive more than 1000 badges per day: [tierFourRequirement](#tierfourrequirement)
 
 ##### Parameters
 
@@ -362,7 +362,7 @@ To receive more than five badges per day: [tierTwoRequirement](#tierTwoRequireme
 
 ##### Returns
 
- `bool` - Will return true if this address has enough stake to call [receiveBadge](#receiveBadge) or false otherwise.
+ `bool` - Will return true if this address has enough stake to call [receiveBadge](#receivebadge) or false otherwise.
 
 ##### Example
 
@@ -375,7 +375,7 @@ let hasEnough = rozet.receiveBadge('0x96311e071Ecc22A486144c9E178f21776F876873')
 
 This function returns the required amount of Roz stake (denominated in Roz-Wei) to issue or receive more than five badges per 24 hour period. Note that issuing and receiving are tallied separately. For example, if an address issues four badges and receives three badges then they will be able to issue one more badge and receive two more badge before reaching the sending and receiving limit for tier two is reached.
 
-To see how voting for this value works please see [stakeTokens](#stakeTokens)
+To see how voting for this value works please see [stakeTokens](#staketokens)
 
 ##### Parameters
 
@@ -384,7 +384,7 @@ None.
 ##### Returns
 
 `uint` - The required amount of stake necessary to call
- [issueBadge](#issueBadge) or  [issueBadgeFromSignature](#issueBadgeFromSignature) more than five times in a 24 hour period. This value is also the required amount of stake needed to call [receiveBadge](#receiveBadge) more than five times in a 24 hour period.
+ [issueBadge](#issuebadge) or  [issueBadgeFromSignature](#issuebadgefromsignature) more than five times in a 24 hour period. This value is also the required amount of stake needed to call [receiveBadge](#receivebadge) more than five times in a 24 hour period.
 
 ##### Example
 
@@ -398,7 +398,7 @@ let tierTwoRequirement = rozet.tierTwoRequirement();
 
 This function returns the required amount of Roz stake (denominated in Roz-Wei) to issue or receive more than 100 badges per 24 hour period.
 
-To see how voting for this value works please see [stakeTokens](#stakeTokens)
+To see how voting for this value works please see [stakeTokens](#staketokens)
 
 ##### Parameters
 
@@ -407,7 +407,7 @@ None.
 ##### Returns
 
  `uint` - The required amount of stake necessary to call
- [issueBadge](#issueBadge) or  [issueBadgeFromSignature](#issueBadgeFromSignature) more than 100 times in a 24 hour period. This value is also the required amount of stake needed to call [receiveBadge](#receiveBadge) more than 100 times in a 24 hour period.
+ [issueBadge](#issuebadge) or  [issueBadgeFromSignature](#issuebadgefromsignature) more than 100 times in a 24 hour period. This value is also the required amount of stake needed to call [receiveBadge](#receivebadge) more than 100 times in a 24 hour period.
 
 ##### Example
 
@@ -420,7 +420,7 @@ let tierThreeRequirement = rozet.tierThreeRequirement();
 
 This function returns the required amount of Roz stake (denominated in Roz-Wei) to issue or receive more than 1000 badges per 24 hour period.
 
-To see how voting for this value works please see [stakeTokens](#stakeTokens)
+To see how voting for this value works please see [stakeTokens](#staketokens)
 
 ##### Parameters
 
@@ -429,7 +429,7 @@ None.
 ##### Returns
 
  `uint` - The required amount of stake necessary to call
- [issueBadge](#issueBadge) or  [issueBadgeFromSignature](#issueBadgeFromSignature) more than 1000 times in a 24 hour period. This value is also the required amount of stake needed to call [receiveBadge](#receiveBadge) more than 1000 times in a 24 hour period.
+ [issueBadge](#issuebadge) or  [issueBadgeFromSignature](#issuebadgefromsignature) more than 1000 times in a 24 hour period. This value is also the required amount of stake needed to call [receiveBadge](#receivebadge) more than 1000 times in a 24 hour period.
 
 ##### Example
 
@@ -443,17 +443,17 @@ let tierFourRequirement = rozet.tierFourRequirement();
 
 The Rozet badges can be receivable or not receivable. A receivable badge is more reputable than a non-receivable badge, but it requires a fee. This fee is not paid to a central authority, instead it is paid to the most reputable users of the network. These reputable users are called beneficiaries.
 
-When sending a receivable badge to a user the fee must be paid to a valid beneficiary. This function is used to determine what addresses are owned by valid beneficiaries. The address is then passed to [issueBadge](#issueBadge) or [issueBadgeFromSignature](#issueBadgeFromSignature) to issue a receivable badge.
+When sending a receivable badge to a user the fee must be paid to a valid beneficiary. This function is used to determine what addresses are owned by valid beneficiaries. The address is then passed to [issueBadge](#issuebadge) or [issueBadgeFromSignature](#issuebadgefromsignature) to issue a receivable badge.
 
 If there are no valid beneficiaries for a given recipient, then it is free to send that recipient a receivable badge.
 
 ##### Parameters
 
- `address` - The intended recipient of the receivable badge. Valid beneficiaries must be a ```badge.sponsor``` of the recipient's previous badges that has already been received via [receiveBadge](#receiveBadge).
+ `address` - The intended recipient of the receivable badge. Valid beneficiaries must be a ```badge.sponsor``` of the recipient's previous badges that has already been received via [receiveBadge](#receivebadge).
 
 ##### Returns
 
- `address[]` - An array of valid beneficiaries. Passing any valid beneficiary to [issueBadge](#issueBadge) will result in a receivable badge being issued. It is up to the badge issuer to choose a beneficiary to reward.
+ `address[]` - An array of valid beneficiaries. Passing any valid beneficiary to [issueBadge](#issuebadge) will result in a receivable badge being issued. It is up to the badge issuer to choose a beneficiary to reward.
 
 ##### Example
 
@@ -555,15 +555,15 @@ let votedAddresses = rozetToken.getVotesForSuperUsers('0xf06162929767F6a7779af93
 
 ## stakeTokens
 
-Staking tokens is required to call [issueBadge](#issueBadge), [issueBadgeFromSignature](#issueBadgeFromSignature), and
-  [receiveBadge](#receiveBadge) more than five times per day. It is also required to vote for [badgePrice](#badgePrice) and [stakeRequirement](#stakeRequirement). Staked tokens send a signal to RozetRank algorithms that the associated address has a vested interest in the health of the reputation system.
+Staking tokens is required to call [issueBadge](#issuebadge), [issueBadgeFromSignature](#issuebadgefromsignature), and
+  [receiveBadge](#receivebadge) more than five times per day. It is also required to vote for [badgePrice](#badgeprice) and [stakeRequirement](#stakerequirement). Staked tokens send a signal to RozetRank algorithms that the associated address has a vested interest in the health of the reputation system.
 
 ##### Parameters
 
 1. `address` - The beneficiary of the stake. If you intend to stake tokens for yourself then this is your address. You may also stake tokens for some other address in exchange for payment off-chain.
 2. `uint` - The amount of Roz tokens to be staked, denominated in Roz-Wei.
-3. `uint` - A vote for the badge price required to issue a receivable ([receiveBadge](#receiveBadge)) badge with [issueBadge](#issueBadge). A value of zero abstains from voting. The price is denominated in Roz-Wei.
-4. `uint` - A vote for stake requirements. This is a base multiplier that is used to determined the stake amount (denominated in Roz-Wei) for issuing more than five badges per day (i.e. [tierTwoRequirement](#tierTwoRequirement)). This value is  multiplied by ten to determine the stake requirement to issue more than 100 badges per day ([tierThreeRequirement](#tierThreeRequirement). This value is multiplied by 100 to determine the stake requirements to issue more than 1000 badges per day ([tierFourRequirement](#tierFourRequirement). A value of zero abstains from voting.
+3. `uint` - A vote for the badge price required to issue a receivable ([receiveBadge](#receivebadge)) badge with [issueBadge](#issuebadge). A value of zero abstains from voting. The price is denominated in Roz-Wei.
+4. `uint` - A vote for stake requirements. This is a base multiplier that is used to determined the stake amount (denominated in Roz-Wei) for issuing more than five badges per day (i.e. [tierTwoRequirement](#tiertwotrequirement)). This value is  multiplied by ten to determine the stake requirement to issue more than 100 badges per day ([tierThreeRequirement](#tierthreerequirement). This value is multiplied by 100 to determine the stake requirements to issue more than 1000 badges per day ([tierFourRequirement](#tierfourrequirement). A value of zero abstains from voting.
 
 
 ##### Returns
@@ -589,7 +589,7 @@ Returns the IDs of any stake objects that a given address has issued.
 
 ##### Returns
 
-`uint[]` - An array of stake IDs. The ID can be used to query the properties of the stake by calling [getStakeById](#getStakeById).
+`uint[]` - An array of stake IDs. The ID can be used to query the properties of the stake by calling [getStakeById](#getstakebyid).
 
 ##### Example
 
@@ -603,11 +603,11 @@ Returns the properties of a stake given the stake ID.
 
 ##### Parameters
 
-  `uint` - The ID of the stake returned by [stakesOf](#stakesOf).
+  `uint` - The ID of the stake returned by [stakesOf](#stakesof).
 
 ##### Returns
 
-1. `address` - The address of the stake holder. I.e. the address that originally created this stake by calling [stakeTokens](#stakeTokens).
+1. `address` - The address of the stake holder. I.e. the address that originally created this stake by calling [stakeTokens](#staketokens).
 2. `address` - The beneficiary. This is the address that gains the privilege to issue and receive higher volume of badges from the staked tokens.
 3.  `uint` - The amount of Roz that is staked, denominated in Roz-Wei.
 4. `uint` - A timestamp indicating when the stake was issued.  
@@ -627,7 +627,7 @@ While Roz is staked the Roz is held in escrow by the RozetToken smart contract. 
 
 ##### Parameters
 
-  `uint` - The ID of the stake returned by [stakesOf](#stakesOf).
+  `uint` - The ID of the stake returned by [stakesOf](#stakesof).
 
 ##### Returns
 
@@ -643,8 +643,8 @@ rozetToken.releaseStakedTokens(134)
 
 ## getVoters
 
-Voters are addresses that have voted for either [badgePrice](#badgePrice) or
-   [stakeRequirement](#stakeRequirement) by calling [stakeTokens](#stakeTokens) with non-zero values for ```badgePrice``` and ```stakeRequriement``` parameters.
+Voters are addresses that have voted for either [badgePrice](#badgeprice) or
+   [stakeRequirement](#stakerequirement) by calling [stakeTokens](#staketokens) with non-zero values for ```badgePrice``` and ```stakeRequriement``` parameters.
 
 ##### Parameters
 
@@ -652,7 +652,7 @@ Voters are addresses that have voted for either [badgePrice](#badgePrice) or
 
 ##### Returns
 
- `address[]` - An array of all voters. This array is used to determine what address is eligible to randomly receive Roz payment as a reward when [setName](#setName) is called.
+ `address[]` - An array of all voters. This array is used to determine what address is eligible to randomly receive Roz payment as a reward when [setName](#setname) is called.
 
 ##### Example
 
@@ -681,7 +681,7 @@ let supply = rozetToken.totalSupply()
 
 ## approve
 
-The standard ERC20 function that approves Roz to be taken by a third party. [receiveBadge](#receiveBadge) requires that the caller approve the Rozet contract to take the [badgePrice](#badgePrice) from the caller before it will execute. [setName](#setName) requires that the caller approve the Rozet contract to take the [DNSFee](#DNSFee) before it will execute.
+The standard ERC20 function that approves Roz to be taken by a third party. [receiveBadge](#receivebadge) requires that the caller approve the Rozet contract to take the [badgePrice](#badgeprice) from the caller before it will execute. [setName](#setname) requires that the caller approve the Rozet contract to take the [DNSFee](#dnsfee) before it will execute.
 
 ##### Parameters
 
