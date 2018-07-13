@@ -711,7 +711,7 @@ The standard ERC20 function to transfer from a specific address.
 
 ##### Returns
 
-3. `bool` - Returns true if successful or false otherwise.
+`bool` - Returns true if successful or false otherwise.
 
 ##### Example
 Note that 'ether' denotes the denomination and not the currency. In this example Roz is being transferred not Ether.
@@ -731,7 +731,7 @@ The standard ERC20 function to transfer from the caller's address.
 
 ##### Returns
 
-3. `bool` - Returns true if successful or false otherwise.
+`bool` - Returns true if successful or false otherwise.
 
 ##### Example
 Note that 'ether' denotes the denomination and not the currency. In this example Roz is being transferred not Ether.
