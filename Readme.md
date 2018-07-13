@@ -327,9 +327,9 @@ await rozet.setName("Name to set", {from: voterOne})
 Each user can issue no more than five badges per day without any stake. To issue a higher volume of badges, a user must stake Roz equal to the staking requirements. This function determines if a user has enough stake to issue a badge based on their usage history thus far.
 
 The specific stake requirements vary depending on how the Roz holders vote. The current stake requirements are queried with:
-To issue more than five badges per day: [tierTwoRequirement](#tiertworequirement)
- To issue more than 100 badges per day: [tierThreeRequirement](#tierthreerequirement)
- To issue more than 1000 badges per day: [tierFourRequirement](#tierfourrequirement)
+ [tierTwoRequirement](#tiertworequirement) (5 or more badges per day),
+[tierThreeRequirement](#tierthreerequirement) (100 or more badges per day), and
+[tierFourRequirement](#tierfourrequirement) (1000 or more badges per day).
 
 ##### Parameters
 
