@@ -1,3 +1,15 @@
+# Introduction
+
+With Rozet, applications can query reviews and reputation scores for any topic (books, Amazon products, places, addresses, people, etc.)  or Ethereum address through a REST API. It uses the blockchain for its immutablity, decentralization, and uses proof-of-stake to prevent manipulation.
+
+The 3 layers consist of:
+
+1. `Ethereum` - Onchain interface to publish reviews, elect superusers based on stake, and vote for governing decisions, with direct onchain incentives to do the right thing, and participate often.
+2. `Data Analysis` - Offchain, mutable data analysis algorithm and AI similar to Google that ranks topics/users based on non-cheatable data points set in Layer 1.
+3. `REST API` - Offchain interface for querying Layer 2 reputation scores, rankings, reviews, users, and topics.
+
+Below is the documentation for Layer 1.
+
 **Contents**
 
 - [Introduction](#introduction)
@@ -41,19 +53,6 @@
    - [badgePrice](#badgeprice)
    - [stakeRequirement](#stakerequirement)
 
-
-# Introduction
-
-With Rozet, applications can query reviews and reputation scores for any topic (books, Amazon products, places, addresses, people, etc.)  or Ethereum address through a REST API. It uses the blockchain for its immutablity, decentralization, and uses proof-of-stake to prevent manipulation.
-
-The 3 layers consist of:
-
-1. `Ethereum` - Onchain interface to publish reviews, elect superusers based on stake, and vote for governing decisions, with direct onchain incentives to do the right thing, and participate often.
-2. `Data Analysis` - Offchain, mutable data analysis algorithm and AI similar to Google that ranks topics/users based on non-cheatable data points set in Layer 1.
-3. `REST API` - Offchain interface for querying Layer 2 reputation scores, rankings, reviews, users, and topics.
-
-Below is the documentation for Layer 1.
-
 ## Overview
 
 To publish a review onchain, activate [issueBadge](#issuebadge). This [badge](#getbadgebyid) contains a JSON object with a rating. To issue a badge with your application on behalf of one of your users, activate [issueBadgeFromSignature](#issueBadgeFromSignature) with a badge signed by your user as argument. Or alternatively, prompt your user to add your application to his list of trusted sponsors with [setTrustedSponsor](#settrustedsponsor).
@@ -62,7 +61,7 @@ To receive a badge, activate [receiveBadge](#receivebadge). This lets you add yo
 
 ##### Receivable Badges
 
-To send a receivable badge, activate [unlockRoz](#unlockroz) to pay for its fee. Activate [issueBadge](#issuebadge) with a sponsor from the `previousSponsorsArray` of the recipient. Use [getValidBeneficiaries](#getvalidbeneficiaries) to get this array. After the badge is received, you will get added to this list and start earning redistribution. If a user has never received a badge, his `previousSponsorsArray` is empty. You could say that this user was never "authenticated". You can then "authenticate" him, for free.
+To send a receivable badge, activate [approve](#approve) to pay for its fee. Activate [issueBadge](#issuebadge) with a sponsor from the previous `receivedSponsors` of the recipient  as beneficiary. Use [getValidBeneficiaries](#getvalidbeneficiaries) to get previous `receivedSponsors`. After the badge is received, you will get added to `receivedSponsors` and start earning redistribution. If a user has never received a badge, his `receivedSponsors` is empty. You could say that this user was never "authenticated". You can then "authenticate" him, for free.
 
 This redistribution scheme prevents spam by adding a fee to badges, and rewards high quality applications by allowing them to profit. For example, your application should reject users authenticated only by unkown applications, because they will likely be sockpuppets who authenticated themselves. But your application should welcome users authenticated by a well known organisation, because they likely are real. To query a list of trusted applications, see Layer 2.
 
@@ -78,7 +77,11 @@ Another prevention measure is the stake required to activate [issueBadge](#issue
 
 ##### Incentives
 
-Stakeholders and applications are both incentivized to do good, and participate often, but your users can also give each other incentives to act, directly onchain. A sender can incentivize a recipient to sign (i.e. review him or his product) by awarding a Roz reward that is automatically unlocked after signing. To do so activate [unlockRoz](#unlockroz) and [issueBadge](#issuebadge) with xxxxxx as argument.
+Stakeholders and applications are both incentivized to do good, and participate often, but your users can also give each other incentives to act, directly onchain. A sender can incentivize a recipient to sign (i.e. review him or his product) by awarding a Roz reward that is automatically unlocked after signing. To do so activate [approve](#approve) and [issueBadge](#issuebadge) with `recipientPayment` as argument.
+
+##### Linking Accounts
+
+To link your Bitcoin address (or any other blockchain/service), activate [linkAccount](#linkaccount).
 
 ## Installation
 Get started by downloading the repository and running the unit tests.
@@ -104,6 +107,24 @@ ganache-cli -e 600000
 ```bash
 truffle test
 ```
+
+## Promisify
+
+Every example in this document assumes that the Rozet methods have already been promisified.
+
+##### Example
+
+```js
+// Natively in node.js
+const util = require('util');
+rozetToken.totalSupply = util.promisify(rozetToken.totalSupply);
+const supply = await rozetToken.totalSupply();
+
+// Using bluebird
+Promise.promisifyAll(RozetToken);
+const supply = await rozetToken.totalSupplyAsync();
+```
+
 ***
 
 # Rozet
@@ -133,7 +154,7 @@ Examples of a badge are, a movie review, diploma, trophy, or award.
 ##### Example
 
 ```js
-await rozet.issueBadge(
+rozet.issueBadge(
   '0xf06162929767F6a7779af9339687023cf2351fc5',
   '0x96311e071Ecc22A486144c9E178f21776F876873',
   '0x0000000000000000000000000000000000000000',
@@ -160,7 +181,7 @@ The first three parameters v, r, and s are all parts of the elliptic curve signa
 `uint` - The unique badge ID of this badge. This can be used to query badge data by passing it to [getBadgeById](#getbadgebyid). It can also be used by the recipient to receive the badge by passing it to [receiveBadge](#receivebadge).
 
 ##### Example
-Note ```ethers.Wallet.createRandom``` is from https://github.com/ethers-io/ethers.js/ and
+> **NOTE** ```ethers.Wallet.createRandom``` is from https://github.com/ethers-io/ethers.js/ and
 ```ethAbi.soliditySHA3``` is from https://github.com/ethereumjs/ethereumjs-abi
 
 
@@ -209,7 +230,7 @@ None.
 ##### Example
 
 ```js
-await rozet.receiveBadge(3, '{"content":"Infinity War is great!","rating":5}');
+rozet.receiveBadge(3, '{"content":"Infinity War is great!","rating":5}');
 ```
 ***
 
@@ -583,7 +604,7 @@ None.
 ##### Example
 
 ```js
-await rozetToken.voteForSuperUser('0xf06162929767F6a7779af9339687023cf2351fc5');
+rozetToken.voteForSuperUser('0xf06162929767F6a7779af9339687023cf2351fc5');
 ```
 
 ## getVotesForSuperUsers
@@ -625,7 +646,7 @@ None.
 Note that 'ether' denotes the denomination and not the currency. In this example Roz is being used to stake and vote not Ether.
 
 ```js
-await rozetToken.stakeTokens(
+rozetToken.stakeTokens(
   '0xf06162929767F6a7779af9339687023cf2351fc5',
   web3.toWei(50, 'ether'),
   web3.toWei(1, 'ether'),
@@ -692,7 +713,7 @@ None.
 ##### Example
 
 ```js
-await rozetToken.releaseStakedTokens(134);
+rozetToken.releaseStakedTokens(134);
 ```
 
 
@@ -752,7 +773,7 @@ The standard ERC20 function that approves Roz to be taken by a third party. [rec
 
 ```js
 const badgePrice = await rozetToken.badgePrice();
-await rozetToken.approve(rozet.address, badgePrice, {from: consumerAddress});
+rozetToken.approve(rozet.address, badgePrice, {from: consumerAddress});
 ```
 
 ## transferFrom
@@ -773,7 +794,7 @@ The standard ERC20 function to transfer from a specific address.
 Note that 'ether' denotes the denomination and not the currency. In this example Roz is being transferred not Ether.
 
 ```js
-await rozetToken.transferFrom(
+rozetToken.transferFrom(
   '0xf06162929767F6a7779af9339687023cf2351fc5',
   '0x96311e071Ecc22A486144c9E178f21776F876873',
   web3.toWei(1, 'ether')
@@ -797,7 +818,7 @@ The standard ERC20 function to transfer from the caller's address.
 Note that 'ether' denotes the denomination and not the currency. In this example Roz is being transferred not Ether.
 
 ```js
-await rozetToken.transfer(
+rozetToken.transfer(
   '0x96311e071Ecc22A486144c9E178f21776F876873',
   web3.toWei(1, 'ether')
 );
@@ -820,7 +841,7 @@ None.
 Note that 'ether' denotes the denomination and not the currency. In this example Roz is being burned not Ether.
 
 ```js
-await rozetToken.burn(web3.toWei(1, 'ether'));
+rozetToken.burn(web3.toWei(1, 'ether'));
 ```
 
 
