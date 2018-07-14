@@ -1,7 +1,8 @@
 **Contents**
 
 - [Introduction](#introduction)
-- [Installation](#installation)
+  - [Overview](#overview)
+  - [Installation](#installation)
 - [Rozet](#rozet)
   - [issueBadge](#issuebadge)
   - [issueBadgeFromSignature](#issuebadgefromsignature)
@@ -42,9 +43,42 @@
 
 
 # Introduction
-Rozet is a proof of stake protocol to replace the centralized search ranking, consumer reviews, and fraud detection industry.
 
+With Rozet, applications can query reviews and reputation scores for any topic (books, Amazon products, places, addresses, people, etc.)  or Ethereum address through a REST API. It uses the blockchain for its immutablity, decentralization, and uses proof-of-stake to prevent manipulation.
 
+The 3 layers consist of:
+
+1. `Ethereum` - Onchain interface to publish reviews, elect superusers based on stake, and vote for governing decisions, with direct onchain incentives to do the right thing, and participate often.
+2. `Data Analysis` - Offchain, mutable data analysis algorithm and AI similar to Google that ranks topics/users based on non-cheatable data points set in Layer 1.
+3. `REST API` - Offchain interface for querying Layer 2 reputation scores, rankings, reviews, users, and topics.
+
+Below is the documentation for Layer 1.
+
+## Overview
+
+To publish a review onchain, activate [issueBadge](#issuebadge). This [badge](#getbadgebyid) contains a JSON object with a rating. To issue a badge with your application on behalf of one of your users, activate [issueBadgeFromSignature](#issueBadgeFromSignature) with a badge signed by your user as argument. Or alternatively, prompt your user to add your application to his list of trusted sponsors with [setTrustedSponsor](#settrustedsponsor).
+
+To receive a badge, activate [receiveBadge](#receivebadge). This lets you add your own rating to the badge, and marks it as `recipientSigned`. Recipient signed badges hold more reputation because they are not free.
+
+##### Receivable Badges
+
+To send a receivable badge, activate [unlockRoz](#unlockroz) to pay for its fee. Activate [issueBadge](#issuebadge) with a sponsor from the `previousSponsorsArray` of the recipient. Use [getValidBeneficiaries](#getvalidbeneficiaries) to get this array. After the badge is received, you will get added to this list and start earning redistribution. If a user has never received a badge, his `previousSponsorsArray` is empty. You could say that this user was never "authenticated". You can then "authenticate" him, for free.
+
+This redistribution scheme prevents spam by adding a fee to badges, and rewards high quality applications by allowing them to profit. For example, your application should reject users authenticated only by unkown applications, because they will likely be sockpuppets who authenticated themselves. But your application should welcome users authenticated by a well known organisation, because they likely are real. To query a list of trusted applications, see Layer 2.
+
+Your application should also welcome new users, that you can authenticate for free, and get paid when another application decides to trust you, and send badges to your users.
+
+##### Manipulation
+
+To prevent manipulation, stakeholders should elect superusers by activating [voteForSuperUser](#voteforsuperuser). They are incentivized to do so because if a staker has not voted in the last 30 days, he becomes ineligible to earn Roz from the DNS fee redistribution. (Layer 2 marks clusters of badges that are too far away from elected users as spam.)
+
+To stake and/or vote for governance functions, see [stakeTokens](#staketokens). Fees and tier amounts are decided through this stake-weighted vote.
+
+Another prevention measure is the stake required to activate [issueBadge](#issuebadge). You cannot issue more than 5 badges per day without staking. See [tierTwoRequirement](#tiertworequirement), [tierThreeRequirement](#tierthreerequirement) and [tierFourRequirement](#tierfourrequirement) for details.
+
+##### Incentives
+
+Stakeholders and applications are both incentivized to do good, and participate often, but your users can also give each other incentives to act, directly onchain. A sender can incentivize a recipient to sign (i.e. review him or his product) by awarding a Roz reward that is automatically unlocked after signing. To do so activate [unlockRoz](#unlockroz) and [issueBadge](#issuebadge) with xxxxxx as argument.
 
 ## Installation
 Get started by downloading the repository and running the unit tests.
@@ -99,12 +133,17 @@ Examples of a badge are, a movie review, diploma, trophy, or award.
 ##### Example
 
 ```js
-rozet.issueBadge('0xf06162929767F6a7779af9339687023cf2351fc5', '0x96311e071Ecc22A486144c9E178f21776F876873', '0x0000000000000000000000000000000000000000', "Infinity War is 5 stars.")
+await rozet.issueBadge(
+  '0xf06162929767F6a7779af9339687023cf2351fc5',
+  '0x96311e071Ecc22A486144c9E178f21776F876873',
+  '0x0000000000000000000000000000000000000000',
+  '{"content":"Infinity War is great!","rating":5}'
+);
 ```
 ***
 ## issueBadgeFromSignature
 
-Issuing a badge from signature is provides the same functionality as [issueBadge](#issuebadge) except that it can be called by a third party on behalf of a sender to save the sender gas.
+Issuing a badge from signature provides the same functionality as [issueBadge](#issuebadge) except that it can be called by a third party on behalf of a sender to save the sender gas.
 
 ##### Parameters
 The first three parameters v, r, and s are all parts of the elliptic curve signature that the Rozet smart contract uses to prove that only the true owner of the sender's address signed the transaction. See the Javascript example below.
@@ -126,24 +165,29 @@ Note ```ethers.Wallet.createRandom``` is from https://github.com/ethers-io/ether
 
 
 ```js
-  const wallet = ethers.Wallet.createRandom()
-  let sender = '0xf06162929767F6a7779af9339687023cf2351fc5'
-  let recipient = '0x96311e071Ecc22A486144c9E178f21776F876873'
-  let beneficiary = '0x0000000000000000000000000000000000000000'
-  let review = "Infinity War is 5 stars."
+const wallet = ethers.Wallet.createRandom();
+const sender = '0xf06162929767F6a7779af9339687023cf2351fc5';
+const recipient = '0x96311e071Ecc22A486144c9E178f21776F876873';
+const beneficiary = '0x0000000000000000000000000000000000000000';
+const review = '{"content":"Infinity War is great!","rating":5}';
 
-  let message = ethAbi.soliditySHA3(
-    ["address", "address", "address", "string"],
-    [sender, recipient, addressToPay, review]
-  )
-  let signature = wallet.signMessage(message)
-  signature = signature.slice(2)
-  let r = '0x' + signature.slice(0, 64)
-  let s = '0x' + signature.slice(64, 128)
-  let v = parseInt(signature.slice(128), 16)
+const message = ethAbi.soliditySHA3(
+  ["address", "address", "address", "string"],
+  [sender, recipient, addressToPay, review]
+)
+const signature = wallet.signMessage(message);
+signature = signature.slice(2);
+const r = '0x' + signature.slice(0, 64);
+const s = '0x' + signature.slice(64, 128);
+const v = parseInt(signature.slice(128), 16);
 
-  let recoveredSender = await rozet.issueBadgeFromSignature(v, r, s, sender, recipient, addressToPay, review)
-
+const recoveredSender = await rozet.issueBadgeFromSignature(
+  v, r, s,
+  sender,
+  recipient,
+  addressToPay,
+  review
+);
 ```
 ***
 
@@ -165,7 +209,7 @@ None.
 ##### Example
 
 ```js
-rozet.receiveBadge(3, "Infinity War is 5 stars.");
+await rozet.receiveBadge(3, '{"content":"Infinity War is great!","rating":5}');
 ```
 ***
 
@@ -182,7 +226,7 @@ Returns badge properties give the ID of a badge.
 
 1. `string` - The sender data. For example a review.
 2. `string` - The recipient data. For example a review or response to a review.
-3. 'address' - The sponsor. A sponsor is someone who sends a badge on behalf of a user without that users signature. A user may later approve a sponsor and thus signal that they approve of the message sent on their behalf. If a user does not wish to take the risk of a sponsor sending data on their behalf they are free to use [issueBadgeFromSignature](#issuebadgefromsignature). Neither method requires the user paying gas. Additionally a user may sponsor their own badges, which requires them to pay the gas fee and badge fee, but also makes them eligible for future Roz rewards since they can now be valid beneficiaries to future badge issuers that are required to pay the network.
+3. `address` - The sponsor. A sponsor is someone who sends a badge on behalf of a user without that user's signature. A user may later approve a sponsor and thus signal that they approve of the message sent on their behalf. If a user does not wish to take the risk of a sponsor sending data on their behalf they are free to use [issueBadgeFromSignature](#issuebadgefromsignature). Neither method requires the user paying gas. Additionally a user may sponsor their own badges, which requires them to pay the gas fee and badge fee, but also makes them eligible for future Roz rewards since they can now be valid beneficiaries to future badge issuers that are required to pay the network.
 4. `string` - The address of the user who may have written badge.senderData.
 5. `address` - The recipient address. Only this address is allowed to upload recipientData via [receiveBadge](#receivebadge).
 6. `bool` - Recipient Signed. This indicates that the recipient has received this badge.
@@ -192,7 +236,7 @@ Returns badge properties give the ID of a badge.
 ##### Example
 
 ```js
-let badgeInformation = rozet.getBadgeById(3);
+const badge = await rozet.getBadgeById(3);
 ```
 ***
 
@@ -203,7 +247,7 @@ Returns an array of badge IDs that have been issued to a given address.
 
 ##### Parameters
 
- `address` - The address of the user whose badge's are to be queried.
+ `address` - The address of the user whose badges are to be queried.
 
 ##### Returns
 
@@ -212,7 +256,7 @@ Returns an array of badge IDs that have been issued to a given address.
 ##### Example
 
 ```js
-let badges = rozet.badgesof('0x96311e071Ecc22A486144c9E178f21776F876873');
+const badgeIDs = await rozet.badgesof('0x96311e071Ecc22A486144c9E178f21776F876873');
 ```
 ***
 
@@ -254,7 +298,7 @@ This method can be called by RozetRank algorithms to assess the quality of a bad
 ##### Example
 
 ```js
-let sponsors = rozet.getTrustedSponsor('0x96311e071Ecc22A486144c9E178f21776F876873');
+const sponsors = await rozet.getTrustedSponsor('0x96311e071Ecc22A486144c9E178f21776F876873');
 ```
 ***
 
@@ -274,7 +318,7 @@ This method is part of the Rozet Domain Name System.
 ##### Example
 
 ```js
-let name = rozet.getNameFromAddress('0x96311e071Ecc22A486144c9E178f21776F876873');
+const name = await rozet.getNameFromAddress('0x96311e071Ecc22A486144c9E178f21776F876873');
 ```
 ***
 
@@ -296,7 +340,7 @@ None.
 ##### Example
 
 ```js
-let fee = rozet.DNSFee();
+const fee = await rozet.DNSFee();
 ```
 ***
 
@@ -316,9 +360,9 @@ None.
 ##### Example
 
 ```js
-let fee = await rozet.DNSFee()
-await rozetToken.approve(rozet.address, fee, {from: voterOne})
-await rozet.setName("Name to set", {from: voterOne})
+const fee = await rozet.DNSFee();
+await rozetToken.approve(rozet.address, fee, {from: voterOne});
+await rozet.setName("Name to set", {from: voterOne});
 ```
 ***
 
@@ -327,7 +371,7 @@ await rozet.setName("Name to set", {from: voterOne})
 Each user can issue no more than five badges per day without any stake. To issue a higher volume of badges, a user must stake Roz equal to the staking requirements. This function determines if a user has enough stake to issue a badge based on their usage history thus far.
 
 The specific stake requirements vary depending on how the Roz holders vote. The current stake requirements are queried with:
- [tierTwoRequirement](#tiertworequirement) (5 or more badges per day),
+[tierTwoRequirement](#tiertworequirement) (5 or more badges per day),
 [tierThreeRequirement](#tierthreerequirement) (100 or more badges per day), and
 [tierFourRequirement](#tierfourrequirement) (1000 or more badges per day).
 
@@ -342,7 +386,7 @@ The specific stake requirements vary depending on how the Roz holders vote. The 
 ##### Example
 
 ```js
-let hasEnough = rozet.hasEnoughStakeToIssue('0x96311e071Ecc22A486144c9E178f21776F876873');
+const hasEnough = await rozet.hasEnoughStakeToIssue('0x96311e071Ecc22A486144c9E178f21776F876873');
 ```
 ***
 
@@ -352,7 +396,7 @@ let hasEnough = rozet.hasEnoughStakeToIssue('0x96311e071Ecc22A486144c9E178f21776
 Each user can receive no more than five badges per day without any stake. To receive a higher volume of badges, a user must stake Roz equal to the staking requirements. This function determines if a user has enough stake to issue a badge based on their usage history thus far.
 
 The specific stake requirements vary depending on how the Roz holders vote. The current stake requirements are queried with:
- [tierTwoRequirement](#tiertworequirement) (5 or more badges per day),
+[tierTwoRequirement](#tiertworequirement) (5 or more badges per day),
 [tierThreeRequirement](#tierthreerequirement) (100 or more badges per day), and
 [tierFourRequirement](#tierfourrequirement) (1000 or more badges per day).
 
@@ -367,7 +411,7 @@ The specific stake requirements vary depending on how the Roz holders vote. The 
 ##### Example
 
 ```js
-let hasEnough = rozet.receiveBadge('0x96311e071Ecc22A486144c9E178f21776F876873');
+const hasEnough = await rozet.receiveBadge('0x96311e071Ecc22A486144c9E178f21776F876873');
 ```
 ***
 
@@ -389,7 +433,7 @@ None.
 ##### Example
 
 ```js
-let tierTwoRequirement = rozet.tierTwoRequirement();
+const tierTwoRequirement = await rozet.tierTwoRequirement();
 ```
 ***
 
@@ -412,11 +456,11 @@ None.
 ##### Example
 
 ```js
-let tierThreeRequirement = rozet.tierThreeRequirement();
+const tierThreeRequirement = await rozet.tierThreeRequirement();
 ```
 ***
 
-## tierFoureRequirement
+## tierFourRequirement
 
 This function returns the required amount of Roz stake (denominated in Roz-Wei) to issue or receive more than 1000 badges per 24 hour period.
 
@@ -434,7 +478,7 @@ None.
 ##### Example
 
 ```js
-let tierFourRequirement = rozet.tierFourRequirement();
+const tierFourRequirement = await rozet.tierFourRequirement();
 ```
 ***
 
@@ -458,22 +502,22 @@ If there are no valid beneficiaries for a given recipient, then it is free to se
 ##### Example
 
 ```js
-let validBeneficiaries = rozet.getValidBeneficiaries('0x96311e071Ecc22A486144c9E178f21776F876873');
+const validBeneficiaries = await rozet.getValidBeneficiaries('0x96311e071Ecc22A486144c9E178f21776F876873');
 ```
 ***
 
 ## setProfile
 
-A profile is a data structure that can optionally be uploaded with no Roz fee that describes properties of an associated address.
+A profile is a data structure that can optionally be uploaded with no Roz fee, that describes properties of an associated address.
 
 ##### Parameters
 
 1. `string` - Country. The country of origin associated with the caller's address.
 2. `string` - URL. A web address associated with the caller's address.
 3. `string` - A link to a .jpg, .png, or .gif banner associated to the caller's address.
-4.  `string` - A description or Biography associated with the caller's address.
-5.  `string` - An additional data field reserved for third party use.
-6.  `string` - An additional data field reserved for third party use.
+4. `string` - A description or biography associated with the caller's address.
+5. `string` - An additional data field reserved for third party use.
+6. `string` - An additional data field reserved for third party use.
 
 ##### Returns
 
@@ -482,7 +526,14 @@ None.
 ##### Example
 
 ```js
- rozet.setProfile('Canada', 'www.Canada.com', 'www.Canada_flag.jpg', 'Canada is lush and verdant', 'Reserved', 'Reserved');
+rozet.setProfile(
+  'Canada',
+  'www.Canada.com',
+  'www.Canada_flag.jpg',
+  'Canada is lush and verdant',
+  'Reserved',
+  'Reserved'
+);
 ```
 ***
 
@@ -507,7 +558,7 @@ A profile is a data structure that can optionally be uploaded with no Roz fee th
 ##### Example
 
 ```js
- let profileData = rozet.getProfile('0x96311e071Ecc22A486144c9E178f21776F876873');
+const profileData = await rozet.getProfile('0x96311e071Ecc22A486144c9E178f21776F876873');
 ```
 ***
 
@@ -532,7 +583,7 @@ None.
 ##### Example
 
 ```js
-rozetToken.voteForSuperUser('0xf06162929767F6a7779af9339687023cf2351fc5')
+await rozetToken.voteForSuperUser('0xf06162929767F6a7779af9339687023cf2351fc5');
 ```
 
 ## getVotesForSuperUsers
@@ -541,7 +592,7 @@ Roz token holders can vote for superusers. A superuser is an additional tag that
 
 ##### Parameters
 
- `address` - The address whose votes are to be queried.
+`address` - The address whose votes are to be queried.
 
 ##### Returns
 
@@ -550,7 +601,7 @@ Roz token holders can vote for superusers. A superuser is an additional tag that
 ##### Example
 
 ```js
-let votedAddresses = rozetToken.getVotesForSuperUsers('0xf06162929767F6a7779af9339687023cf2351fc5')
+const votedAddresses = await rozetToken.getVotesForSuperUsers('0xf06162929767F6a7779af9339687023cf2351fc5');
 ```
 
 ## stakeTokens
@@ -574,7 +625,12 @@ None.
 Note that 'ether' denotes the denomination and not the currency. In this example Roz is being used to stake and vote not Ether.
 
 ```js
-rozetToken.stakeTokens('0xf06162929767F6a7779af9339687023cf2351fc5', web3.toWei(50, 'ether'), web3.toWei(1, 'ether'), web3.toWei(2, 'ether'))
+await rozetToken.stakeTokens(
+  '0xf06162929767F6a7779af9339687023cf2351fc5',
+  web3.toWei(50, 'ether'),
+  web3.toWei(1, 'ether'),
+  web3.toWei(2, 'ether')
+);
 ```
 
 
@@ -594,7 +650,7 @@ Returns the IDs of any stake objects that a given address has issued.
 ##### Example
 
 ```js
-let stakeIDs = rozetToken.stakesOf('0xf06162929767F6a7779af9339687023cf2351fc5')
+const stakeIDs = await rozetToken.stakesOf('0xf06162929767F6a7779af9339687023cf2351fc5');
 ```
 
 ## getStakeById
@@ -615,7 +671,7 @@ Returns the properties of a stake given the stake ID.
 ##### Example
 
 ```js
-let stake = rozetToken.getStakeById(134)
+const stake = await rozetToken.getStakeById(134);
 ```
 
 
@@ -636,7 +692,7 @@ None.
 ##### Example
 
 ```js
-rozetToken.releaseStakedTokens(134)
+await rozetToken.releaseStakedTokens(134);
 ```
 
 
@@ -657,7 +713,7 @@ Voters are addresses that have voted for either [badgePrice](#badgeprice) or
 ##### Example
 
 ```js
-let voters = rozetToken.getVoters()
+const voters = await rozetToken.getVoters();
 ```
 
 
@@ -676,7 +732,7 @@ The standard ERC20 function that returns the total supply of all Roz.
 ##### Example
 
 ```js
-let supply = rozetToken.totalSupply()
+const supply = await rozetToken.totalSupply();
 ```
 
 ## approve
@@ -695,8 +751,8 @@ The standard ERC20 function that approves Roz to be taken by a third party. [rec
 ##### Example
 
 ```js
-let badgePrice = await rozetToken.badgePrice()
-await rozetToken.approve(rozet.address, badgePrice, {from: consumerAddress})
+const badgePrice = await rozetToken.badgePrice();
+await rozetToken.approve(rozet.address, badgePrice, {from: consumerAddress});
 ```
 
 ## transferFrom
@@ -717,7 +773,11 @@ The standard ERC20 function to transfer from a specific address.
 Note that 'ether' denotes the denomination and not the currency. In this example Roz is being transferred not Ether.
 
 ```js
-let badgePrice = await rozetToken.transferFrom('0xf06162929767F6a7779af9339687023cf2351fc5', '0x96311e071Ecc22A486144c9E178f21776F876873', web3.toWei(1, 'ether') )
+await rozetToken.transferFrom(
+  '0xf06162929767F6a7779af9339687023cf2351fc5',
+  '0x96311e071Ecc22A486144c9E178f21776F876873',
+  web3.toWei(1, 'ether')
+)
 ```
 
 ## transfer
@@ -737,7 +797,10 @@ The standard ERC20 function to transfer from the caller's address.
 Note that 'ether' denotes the denomination and not the currency. In this example Roz is being transferred not Ether.
 
 ```js
-let badgePrice = await rozetToken.transfer( '0x96311e071Ecc22A486144c9E178f21776F876873', web3.toWei(1, 'ether') )
+await rozetToken.transfer(
+  '0x96311e071Ecc22A486144c9E178f21776F876873',
+  web3.toWei(1, 'ether')
+);
 ```
 
 
@@ -757,7 +820,7 @@ None.
 Note that 'ether' denotes the denomination and not the currency. In this example Roz is being burned not Ether.
 
 ```js
-rozetToken.burn(web3.toWei(1, 'ether'))
+await rozetToken.burn(web3.toWei(1, 'ether'));
 ```
 
 
