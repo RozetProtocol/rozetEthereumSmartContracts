@@ -121,6 +121,7 @@ rozetToken.totalSupply = util.promisify(rozetToken.totalSupply);
 const supply = await rozetToken.totalSupply();
 
 // Using bluebird
+Promise = require('bluebird');
 Promise.promisifyAll(RozetToken);
 const supply = await rozetToken.totalSupplyAsync();
 ```
